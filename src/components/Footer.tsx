@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import logo from "@/assets/logo.png";
 
 const Footer = () => {
   return (
@@ -15,7 +14,7 @@ const Footer = () => {
           {/* Logo & Brand */}
           <div className="flex items-center gap-3">
             <img
-              src={logo}
+              src="/logo.png"
               alt="Agentes IA Logo"
               className="h-10 w-10 object-contain"
             />

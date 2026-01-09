@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
-import logo from "@/assets/logo.png";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -25,7 +24,7 @@ const Header = () => {
           {/* Logo */}
           <a href="#inicio" className="flex items-center gap-3">
             <img
-              src={logo}
+              src="/logo.png"
               alt="Agentes IA Logo"
               className="h-12 w-12 object-contain"
             />

@@ -1,73 +1,196 @@
-# Welcome to your Lovable project
+# Agentes IA - Landing Page
 
-## Project info
+Landing page moderna y profesional para **Agentes IA**, una empresa especializada en desarrollo de software, aplicaciones móviles y sistemas de inteligencia artificial que automatizan procesos empresariales.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## 🚀 Características
 
-## How can I edit this code?
+- **Diseño Moderno**: Interfaz con efectos glassmorphism, gradientes animados y animaciones fluidas
+- **Totalmente Responsive**: Optimizado para dispositivos móviles, tablets y desktop
+- **Alto Rendimiento**: Construido con Vite para tiempos de carga ultrarrápidos
+- **Animaciones Suaves**: Implementadas con Framer Motion para una experiencia de usuario excepcional
+- **Formulario de Contacto**: Integración directa con WhatsApp para comunicación inmediata
+- **SEO Ready**: Estructura preparada para optimización de motores de búsqueda
 
-There are several ways of editing your application.
+## 🛠️ Stack Tecnológico
 
-**Use Lovable**
+### Frontend Core
+- **React 18.3.1** - Biblioteca de UI
+- **TypeScript 5.8.3** - Tipado estático
+- **Vite 5.4.19** - Build tool y dev server
+- **React Router DOM 6.30.1** - Enrutamiento
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+### UI & Estilos
+- **Tailwind CSS 3.4.17** - Framework de utilidades CSS
+- **shadcn/ui** - Componentes UI basados en Radix UI
+- **Framer Motion 12.24.12** - Animaciones
+- **Lucide React** - Iconos
 
-Changes made via Lovable will be committed automatically to this repo.
+### Estado & Datos
+- **TanStack Query 5.83.0** - Gestión de estado del servidor
+- **React Hook Form 7.61.1** - Manejo de formularios
+- **Zod 3.25.76** - Validación de esquemas
 
-**Use your preferred IDE**
+## 📦 Instalación
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Requisitos Previos
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- Node.js 18+ (recomendado usar [nvm](https://github.com/nvm-sh/nvm))
+- npm o yarn
 
-Follow these steps:
+### Pasos de Instalación
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
+```bash
+# 1. Clonar el repositorio
 git clone <YOUR_GIT_URL>
+cd agentes-ia-launchpad
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# 2. Instalar dependencias
+npm install
 
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# 3. Iniciar servidor de desarrollo
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+El proyecto estará disponible en `http://localhost:8080`
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 📜 Scripts Disponibles
 
-**Use GitHub Codespaces**
+```bash
+# Desarrollo
+npm run dev          # Inicia el servidor de desarrollo en puerto 8080
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+# Build
+npm run build        # Crea un build de producción optimizado
+npm run build:dev    # Crea un build en modo desarrollo
 
-## What technologies are used for this project?
+# Calidad de Código
+npm run lint         # Ejecuta ESLint para verificar el código
 
-This project is built with:
+# Preview
+npm run preview      # Previsualiza el build de producción
+```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 📁 Estructura del Proyecto
 
-## How can I deploy this project?
+```
+agentes-ia-launchpad/
+├── public/                 # Archivos estáticos
+│   ├── logo.png
+│   └── favicon.ico
+├── src/
+│   ├── components/         # Componentes de la aplicación
+│   │   ├── Header.tsx      # Navegación principal
+│   │   ├── Hero.tsx        # Sección hero
+│   │   ├── Services.tsx    # Servicios ofrecidos
+│   │   ├── Approach.tsx    # Metodología de trabajo
+│   │   ├── Contact.tsx     # Formulario de contacto
+│   │   ├── Footer.tsx      # Pie de página
+│   │   └── ui/             # Componentes shadcn/ui
+│   ├── pages/              # Páginas de la aplicación
+│   │   ├── Index.tsx       # Página principal
+│   │   └── NotFound.tsx    # Página 404
+│   ├── hooks/              # Custom React hooks
+│   ├── lib/                # Utilidades y helpers
+│   ├── assets/             # Recursos (imágenes, etc.)
+│   ├── App.tsx             # Componente raíz
+│   ├── main.tsx            # Punto de entrada
+│   └── index.css           # Estilos globales
+├── vite.config.ts          # Configuración de Vite
+├── tailwind.config.ts      # Configuración de Tailwind
+├── tsconfig.json           # Configuración de TypeScript
+└── package.json            # Dependencias y scripts
+```
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+## 🎨 Secciones de la Landing Page
 
-## Can I connect a custom domain to my Lovable project?
+1. **Header** - Navegación fija con menú responsive
+2. **Hero** - Sección principal con CTA y efectos visuales
+3. **Services** - Grid de servicios ofrecidos:
+   - Desarrollo de Apps (Android, iOS, Web)
+   - Chatbots con IA (GPT-4, WhatsApp, Telegram)
+   - Análisis de Datos (Dashboards, BI, Reportes)
+   - Automatización de Procesos (Ventas, Marketing, Delivery)
+4. **Approach** - Metodología de trabajo y caso de éxito
+5. **Contact** - Formulario de contacto e información
+6. **Footer** - Información adicional y enlaces
 
-Yes, you can!
+## 🎯 Características de Diseño
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+- **Tema Oscuro**: Paleta de colores con fondo oscuro (#0D0F14)
+- **Gradientes**: Efectos de gradiente en botones y textos
+- **Glassmorphism**: Efectos de vidrio esmerilado en tarjetas
+- **Animaciones**: Transiciones suaves al hacer scroll
+- **Efectos Glow**: Resplandor en botones y elementos interactivos
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+## 📱 Responsive Design
+
+- **Mobile First**: Diseño optimizado para móviles
+- **Breakpoints**: Adaptación para tablets y desktop
+- **Menú Hamburguesa**: Navegación colapsable en móviles
+- **Grid Adaptativo**: Layouts que se ajustan al tamaño de pantalla
+
+## 🔧 Configuración
+
+### Variables de Entorno
+
+Actualmente no se requieren variables de entorno, pero puedes agregar un archivo `.env` si necesitas configurar:
+
+```env
+VITE_API_URL=your_api_url
+VITE_WHATSAPP_NUMBER=5930983246317
+```
+
+### Personalización
+
+- **Colores**: Edita las variables CSS en `src/index.css`
+- **Contenido**: Modifica los componentes en `src/components/`
+- **Estilos**: Ajusta `tailwind.config.ts` para personalizar el tema
+
+## 📞 Información de Contacto
+
+- **Email**: agentes.ia.agentes@gmail.com
+- **Teléfono**: +593 0983246317 (Ecuador)
+- **WhatsApp**: [Chatea con nosotros](https://wa.me/5930983246317)
+
+## 🚀 Despliegue
+
+### Build de Producción
+
+```bash
+npm run build
+```
+
+Los archivos optimizados se generarán en la carpeta `dist/`.
+
+### Opciones de Despliegue
+
+- **Vercel**: Conecta tu repositorio y despliega automáticamente
+- **Netlify**: Arrastra la carpeta `dist/` o conecta el repo
+- **GitHub Pages**: Usa GitHub Actions para desplegar automáticamente
+- **Lovable**: Si usas Lovable, puedes publicar desde la plataforma
+
+## 🛡️ Seguridad
+
+- Validación de formularios con React Hook Form y Zod
+- Sanitización de inputs en el formulario de contacto
+- Uso de HTTPS en producción (recomendado)
+
+## 📝 Licencia
+
+Todos los derechos reservados © 2025 Agentes IA
+
+## 🤝 Contribuciones
+
+Este es un proyecto privado. Para sugerencias o mejoras, contacta al equipo de desarrollo.
+
+## 📚 Recursos Adicionales
+
+- [Documentación de React](https://react.dev/)
+- [Documentación de Vite](https://vitejs.dev/)
+- [Documentación de Tailwind CSS](https://tailwindcss.com/)
+- [shadcn/ui Components](https://ui.shadcn.com/)
+- [Framer Motion](https://www.framer.com/motion/)
+
+---
+
+**Desarrollado con ❤️ por Agentes IA**
