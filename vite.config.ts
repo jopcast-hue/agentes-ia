@@ -6,21 +6,26 @@ import { componentTagger } from "lovable-tagger";
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   // Para GitHub Pages, siempre usar el base path en producción
-  const base = process.env.GITHUB_PAGES === 'true' || mode === "production" 
+  // Vite usa import.meta.env.PROD para detectar producción
+  const base = mode === "production" || process.env.GITHUB_PAGES === 'true'
     ? "/agentes-ia/" 
     : "/";
   
   return {
     base,
-  server: {
-    host: "::",
-    port: 8080,
-  },
+    server: {
+      host: "::",
+      port: 8080,
+    },
     plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),
       },
+    },
+    build: {
+      outDir: "dist",
+      assetsDir: "assets",
     },
   };
 });
