@@ -177,7 +177,7 @@ El proyecto está configurado para desplegarse automáticamente en GitHub Pages 
 
 Una vez desplegado, tu sitio estará disponible en:
 ```
-https://jopcast-hue.github.io/agentes-ia-launchpad/
+https://jopcast-hue.github.io/agentes-ia/
 ```
 
 #### Despliegue Manual
