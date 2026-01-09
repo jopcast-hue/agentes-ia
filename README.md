@@ -162,11 +162,47 @@ npm run build
 
 Los archivos optimizados se generarán en la carpeta `dist/`.
 
-### Opciones de Despliegue
+### Despliegue en GitHub Pages
+
+El proyecto está configurado para desplegarse automáticamente en GitHub Pages usando GitHub Actions.
+
+#### Configuración Inicial (Solo la primera vez)
+
+1. Ve a la configuración de tu repositorio en GitHub
+2. Navega a **Settings** → **Pages**
+3. En **Source**, selecciona **GitHub Actions**
+4. El workflow se ejecutará automáticamente en cada push a la rama `main`
+
+#### URL del Sitio
+
+Una vez desplegado, tu sitio estará disponible en:
+```
+https://jopcast-hue.github.io/agentes-ia-launchpad/
+```
+
+#### Despliegue Manual
+
+Si necesitas desplegar manualmente:
+
+```bash
+# 1. Build del proyecto
+npm run build
+
+# 2. El workflow de GitHub Actions se ejecutará automáticamente
+# o puedes ejecutarlo manualmente desde la pestaña "Actions" en GitHub
+```
+
+#### Workflow Automático
+
+El proyecto incluye un workflow de GitHub Actions (`.github/workflows/deploy.yml`) que:
+- Se ejecuta automáticamente en cada push a `main`
+- Construye el proyecto
+- Despliega automáticamente a GitHub Pages
+
+### Otras Opciones de Despliegue
 
 - **Vercel**: Conecta tu repositorio y despliega automáticamente
 - **Netlify**: Arrastra la carpeta `dist/` o conecta el repo
-- **GitHub Pages**: Usa GitHub Actions para desplegar automáticamente
 - **Lovable**: Si usas Lovable, puedes publicar desde la plataforma
 
 ## 🛡️ Seguridad
