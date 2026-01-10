@@ -8,27 +8,49 @@ const Contact = () => {
     company: "",
     message: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const whatsappMessage = `Hola, soy ${formData.name} de ${formData.company}. ${formData.message}`;
-    window.open(
-      `https://wa.me/5930983246317?text=${encodeURIComponent(whatsappMessage)}`,
-      "_blank"
-    );
+    e.stopPropagation();
+    
+    // Validar que todos los campos estén llenos
+    if (!formData.name.trim() || !formData.company.trim() || !formData.message.trim()) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    try {
+      const whatsappMessage = `Hola, soy ${formData.name.trim()} de ${formData.company.trim()}. ${formData.message.trim()}`;
+      const whatsappUrl = `https://wa.me/5930983246317?text=${encodeURIComponent(whatsappMessage)}`;
+      
+      // Abrir WhatsApp
+      window.open(whatsappUrl, "_blank", "noopener,noreferrer");
+      
+      // Limpiar formulario después de un breve delay
+      setTimeout(() => {
+        setFormData({ name: "", company: "", message: "" });
+        setIsSubmitting(false);
+      }, 500);
+    } catch (error) {
+      console.error("Error al enviar formulario:", error);
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   return (
     <section id="contacto" className="relative py-24 lg:py-32">
       {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-t from-muted/50 via-transparent to-transparent" />
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gradient-radial from-primary/10 via-secondary/5 to-transparent blur-3xl" />
+      <div className="absolute inset-0 bg-gradient-to-t from-muted/50 via-transparent to-transparent pointer-events-none" />
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[800px] h-[400px] bg-gradient-radial from-primary/10 via-secondary/5 to-transparent blur-3xl pointer-events-none" />
 
       <div className="container mx-auto px-4 lg:px-8 relative z-10">
         {/* Section Header */}
@@ -127,7 +149,8 @@ const Contact = () => {
           >
             <form
               onSubmit={handleSubmit}
-              className="p-8 rounded-2xl glass-card gradient-border"
+              noValidate
+              className="p-8 rounded-2xl glass-card gradient-border relative z-10"
             >
               <h3 className="text-xl font-bold mb-6 text-foreground">
                 Envíanos un mensaje
@@ -193,10 +216,20 @@ const Contact = () => {
 
                 <button
                   type="submit"
-                  className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 rounded-lg bg-gradient-primary text-primary-foreground font-semibold text-lg transition-all duration-300 hover:scale-[1.02] glow-button"
+                  disabled={isSubmitting}
+                  className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 rounded-lg bg-gradient-primary text-primary-foreground font-semibold text-lg transition-all duration-300 hover:scale-[1.02] glow-button disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                 >
-                  Enviar por WhatsApp
-                  <Send className="w-5 h-5" />
+                  {isSubmitting ? (
+                    <>
+                      <span className="animate-spin">⏳</span>
+                      Enviando...
+                    </>
+                  ) : (
+                    <>
+                      Enviar por WhatsApp
+                      <Send className="w-5 h-5" />
+                    </>
+                  )}
                 </button>
               </div>
             </form>
