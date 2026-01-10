@@ -22,13 +22,13 @@ const Header = () => {
       <div className="container mx-auto px-4 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <a href="#inicio" className="flex items-center gap-3">
+          <a href="#inicio" className="flex items-center gap-2 sm:gap-3">
             <img
-              src="/logo.png"
+              src={`${import.meta.env.BASE_URL}logo.png`}
               alt="Agentes IA Logo"
-              className="h-12 w-12 object-contain"
+              className="h-10 w-10 sm:h-12 sm:w-12 object-contain"
             />
-            <span className="text-xl font-bold text-gradient hidden sm:block">
+            <span className="text-base sm:text-xl font-bold text-gradient">
               Agentes IA
             </span>
           </a>

@@ -10,11 +10,11 @@ const Hero = () => {
       {/* Background Effects */}
       <div className="absolute inset-0 bg-gradient-hero" />
       <div className="absolute inset-0 bg-grid-pattern bg-grid opacity-20" />
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-gradient-radial from-secondary/20 via-primary/10 to-transparent blur-3xl" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-full max-w-[800px] h-[600px] bg-gradient-radial from-secondary/20 via-primary/10 to-transparent blur-3xl" />
       
       {/* Floating Orbs */}
-      <div className="absolute top-1/3 left-1/4 w-72 h-72 bg-secondary/20 rounded-full blur-3xl animate-float" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-float" style={{ animationDelay: "2s" }} />
+      <div className="absolute top-1/3 left-1/4 w-64 h-64 sm:w-72 sm:h-72 bg-secondary/20 rounded-full blur-3xl animate-float" />
+      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 sm:w-96 sm:h-96 bg-primary/10 rounded-full blur-3xl animate-float" style={{ animationDelay: "2s" }} />
 
       <div className="container mx-auto px-4 lg:px-8 relative z-10">
         <div className="max-w-4xl mx-auto text-center">

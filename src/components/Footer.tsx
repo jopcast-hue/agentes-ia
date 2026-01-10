@@ -14,7 +14,7 @@ const Footer = () => {
           {/* Logo & Brand */}
           <div className="flex items-center gap-3">
             <img
-              src="/logo.png"
+              src={`${import.meta.env.BASE_URL}logo.png`}
               alt="Agentes IA Logo"
               className="h-10 w-10 object-contain"
             />
