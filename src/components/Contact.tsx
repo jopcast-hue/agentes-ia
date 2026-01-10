@@ -151,6 +151,7 @@ const Contact = () => {
               onSubmit={handleSubmit}
               noValidate
               className="p-8 rounded-2xl glass-card gradient-border relative z-10"
+              style={{ isolation: 'isolate' }}
             >
               <h3 className="text-xl font-bold mb-6 text-foreground">
                 Envíanos un mensaje
@@ -171,7 +172,7 @@ const Contact = () => {
                     value={formData.name}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 rounded-lg bg-muted border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                    className="w-full px-4 py-3 rounded-lg bg-muted border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all relative z-10"
                     placeholder="Juan Pérez"
                   />
                 </div>
@@ -190,7 +191,7 @@ const Contact = () => {
                     value={formData.company}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 rounded-lg bg-muted border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                    className="w-full px-4 py-3 rounded-lg bg-muted border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all relative z-10"
                     placeholder="Mi Empresa S.A."
                   />
                 </div>
@@ -209,7 +210,7 @@ const Contact = () => {
                     onChange={handleChange}
                     required
                     rows={4}
-                    className="w-full px-4 py-3 rounded-lg bg-muted border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all resize-none"
+                    className="w-full px-4 py-3 rounded-lg bg-muted border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all resize-none relative z-10"
                     placeholder="Cuéntanos sobre tu proyecto..."
                   />
                 </div>
@@ -217,7 +218,7 @@ const Contact = () => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 rounded-lg bg-gradient-primary text-primary-foreground font-semibold text-lg transition-all duration-300 hover:scale-[1.02] glow-button disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                  className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 rounded-lg bg-gradient-primary text-primary-foreground font-semibold text-lg transition-all duration-300 hover:scale-[1.02] glow-button disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 relative z-10"
                 >
                   {isSubmitting ? (
                     <>
