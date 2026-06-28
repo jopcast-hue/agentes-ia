@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
@@ -28,7 +29,7 @@ const Footer = () => {
           </p>
 
           {/* Social/Extra Links */}
-          <div className="flex items-center gap-6">
+          <div className="flex flex-wrap justify-center items-center gap-6">
             <a
               href="#inicio"
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -47,6 +48,12 @@ const Footer = () => {
             >
               Contacto
             </a>
+            <Link
+              to="/politicas-de-privacidad"
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Privacidad
+            </Link>
           </div>
         </div>
       </div>
