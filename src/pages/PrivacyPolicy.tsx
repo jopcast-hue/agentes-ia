@@ -91,7 +91,7 @@ const PrivacyPolicy = () => {
               <p>En cumplimiento del Principio de Conservación de la LOPDP, los historiales de interacción y datos personales asociados se conservan por un período estándar de <strong>6 meses</strong> para fines de gestión de reclamos y auditoría de pedidos, tras lo cual son depurados o anonimizados de nuestras bases de datos.</p>
               <p>Si deseas ejercer tu derecho a la eliminación anticipada y definitiva de tus datos personales, puedes seguir estos pasos:</p>
               <ol className="list-decimal list-inside space-y-2 pl-4">
-                <li>Envía un correo electrónico a agentes.ia.agentes@gmail.com detallando tu solicitud.</li>
+                <li>Envía un correo electrónico a datospersonales@agentesia.lat detallando tu solicitud.</li>
                 <li>Nuestro equipo verificará tu identidad para garantizar la seguridad del proceso.</li>
                 <li>Una vez confirmada, todos tus datos personales serán eliminados de forma irreversible de nuestros servidores en un plazo máximo de 72 horas.</li>
               </ol>
