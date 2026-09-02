@@ -18,9 +18,9 @@ const services = [
   },
   {
     icon: BarChart3,
-    title: "Análisis de Datos",
+    title: "Agentes de IA",
     description:
-      "Dashboards personalizados y reportes en tiempo real para la toma de decisiones estratégicas basadas en datos de tu negocio.",
+      "Diseñamos agentes de inteligencia artificial que realizan tareas específicas, atienden a tus clientes y ayudan a tu negocio a operar de forma más ágil.",
     tags: ["Dashboards", "BI", "Reportes"],
   },
   {
