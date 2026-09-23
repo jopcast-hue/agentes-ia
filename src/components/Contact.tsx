@@ -23,7 +23,7 @@ const Contact = () => {
     
     try {
       const whatsappMessage = `Hola, soy ${formData.name.trim()} de ${formData.company.trim()}. ${formData.message.trim()}`;
-      const whatsappUrl = `https://wa.me/5930983246317?text=${encodeURIComponent(whatsappMessage)}`;
+      const whatsappUrl = `https://wa.me/593986827024?text=${encodeURIComponent(whatsappMessage)}`;
       
       // Abrir WhatsApp
       window.open(whatsappUrl, "_blank", "noopener,noreferrer");
@@ -92,7 +92,7 @@ const Contact = () => {
             {/* Contact Cards */}
             <div className="space-y-4">
               <a
-                href="mailto:agentes.ia.agentes@gmail.com"
+                href="mailto:contacto@agentesia.lat"
                 className="flex items-center gap-4 p-5 rounded-xl glass-card group hover:scale-[1.02] transition-all duration-300"
               >
                 <div className="w-14 h-14 rounded-xl bg-gradient-primary flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
@@ -101,13 +101,13 @@ const Contact = () => {
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">Email</p>
                   <p className="font-medium text-foreground">
-                    agentes.ia.agentes@gmail.com
+                    contacto@agentesia.lat
                   </p>
                 </div>
               </a>
 
               <a
-                href="tel:+5930983246317"
+                href="tel:+593986827024"
                 className="flex items-center gap-4 p-5 rounded-xl glass-card group hover:scale-[1.02] transition-all duration-300"
               >
                 <div className="w-14 h-14 rounded-xl bg-gradient-primary flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
@@ -116,13 +116,13 @@ const Contact = () => {
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">Teléfono</p>
                   <p className="font-medium text-foreground">
-                    +593 0983246317 (Ecuador)
+                    +593 98 682 7024 (Ecuador)
                   </p>
                 </div>
               </a>
 
               <a
-                href="https://wa.me/5930983246317"
+                href="https://wa.me/593986827024"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-4 p-5 rounded-xl glass-card group hover:scale-[1.02] transition-all duration-300"

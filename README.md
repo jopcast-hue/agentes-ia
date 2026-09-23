@@ -137,7 +137,7 @@ Actualmente no se requieren variables de entorno, pero puedes agregar un archivo
 
 ```env
 VITE_API_URL=your_api_url
-VITE_WHATSAPP_NUMBER=5930983246317
+VITE_WHATSAPP_NUMBER=593986827024
 ```
 
 ### Personalización
@@ -148,9 +148,9 @@ VITE_WHATSAPP_NUMBER=5930983246317
 
 ## 📞 Información de Contacto
 
-- **Email**: agentes.ia.agentes@gmail.com
-- **Teléfono**: +593 0983246317 (Ecuador)
-- **WhatsApp**: [Chatea con nosotros](https://wa.me/5930983246317)
+- **Email**: contacto@agentesia.lat
+- **Teléfono**: +593 98 682 7024 (Ecuador)
+- **WhatsApp**: [Chatea con nosotros](https://wa.me/593986827024)
 
 ## 🚀 Despliegue
 
