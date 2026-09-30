@@ -27,7 +27,7 @@ const Hero = () => {
           >
             <Sparkles className="w-4 h-4 text-primary" />
             <span className="text-sm text-muted-foreground">
-              Transformación Digital con IA
+              Sistemas inteligentes para restaurantes
             </span>
           </motion.div>
 
@@ -38,8 +38,8 @@ const Hero = () => {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="text-4xl md:text-5xl lg:text-7xl font-bold leading-tight mb-6"
           >
-            Sistematizamos tu empresa con{" "}
-            <span className="text-gradient">Sistemas Inteligentes</span>
+            Llegaron los agentes para{" "}
+            <span className="text-gradient">sistematizar tu restaurante</span>
           </motion.h1>
 
           {/* Subtitle */}
@@ -49,8 +49,9 @@ const Hero = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-10"
           >
-            Desarrollo de software a medida, Apps móviles y Agentes de IA que
-            automatizan tus ventas, marketing y operaciones.
+            Conecta ventas por WhatsApp, inventario, cocina, facturación SRI y
+            operación diaria en un solo sistema. También desarrollamos
+            soluciones a medida para procesos empresariales específicos.
           </motion.p>
 
           {/* CTA Buttons */}
@@ -64,7 +65,7 @@ const Hero = () => {
               href="#contacto"
               className="group inline-flex items-center gap-2 px-8 py-4 rounded-lg bg-gradient-primary text-primary-foreground font-semibold text-lg transition-all duration-300 hover:scale-105 glow-button"
             >
-              Cotizar Proyecto
+              Hablar con el Agente Vendedor
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </a>
             <a

@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 
 const Footer = () => {
+  const currentYear = new Date().getFullYear();
   return (
     <motion.footer
       initial={{ opacity: 0 }}
@@ -24,7 +25,7 @@ const Footer = () => {
 
           {/* Copyright */}
           <p className="text-muted-foreground text-sm text-center">
-            © 2025 Agentes IA - Sistemas Inteligentes. Todos los derechos
+            © {currentYear} Agentes IA - Sistemas Inteligentes. Todos los derechos
             reservados.
           </p>
 

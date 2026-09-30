@@ -1,34 +1,34 @@
 import { motion } from "framer-motion";
-import { Smartphone, Bot, BarChart3, Workflow } from "lucide-react";
+import { UtensilsCrossed, MessageCircle, PackageSearch, Workflow } from "lucide-react";
 
 const services = [
   {
-    icon: Smartphone,
-    title: "Desarrollo de Apps",
+    icon: UtensilsCrossed,
+    title: "ERP y facturación para restaurantes",
     description:
-      "Creamos aplicaciones móviles y web de alto rendimiento para Android, iOS y navegadores. Interfaces intuitivas y experiencias excepcionales.",
-    tags: ["Android", "iOS", "Web"],
+      "POS, comandas, mesas, KDS, recetas y facturación electrónica SRI conectados con la operación diaria.",
+    tags: ["POS", "KDS", "SRI"],
   },
   {
-    icon: Bot,
-    title: "Chatbots con IA",
+    icon: MessageCircle,
+    title: "Agente Vendedor por WhatsApp",
     description:
-      "Agentes conversacionales inteligentes integrados con GPT-4 para WhatsApp, Telegram y más. Atención 24/7 que convierte y fideliza.",
-    tags: ["GPT-4", "WhatsApp", "Telegram"],
+      "Atiende consultas, presenta productos y convierte conversaciones en pedidos registrados dentro del sistema.",
+    tags: ["WhatsApp", "Ventas", "Fidelización"],
   },
   {
-    icon: BarChart3,
-    title: "Agentes de IA",
+    icon: PackageSearch,
+    title: "Agente de Inventario",
     description:
-      "Diseñamos agentes de inteligencia artificial que realizan tareas específicas, atienden a tus clientes y ayudan a tu negocio a operar de forma más ágil.",
-    tags: ["Dashboards", "BI", "Reportes"],
+      "Registra compras desde conversaciones o documentos, conecta recetas con existencias y prepara cambios para aprobación humana.",
+    tags: ["Inventario", "Recetas", "Aprobaciones"],
   },
   {
     icon: Workflow,
-    title: "Automatización de Procesos",
+    title: "Sistematización y software a medida",
     description:
-      "Optimizamos tus operaciones de ventas, marketing y logística con flujos automatizados que trabajan mientras duermes.",
-    tags: ["Ventas", "Marketing", "Delivery"],
+      "Analizamos procesos, responsabilidades y datos para decidir qué conviene documentar, integrar, automatizar o construir.",
+    tags: ["Procesos", "Agentes", "Desarrollo"],
   },
 ];
 
@@ -70,8 +70,8 @@ const Services = () => {
             ¿Qué <span className="text-gradient">hacemos</span>?
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Soluciones tecnológicas integrales que transforman la manera en que
-            operas y conectas con tus clientes.
+            Empezamos con restaurantes y conservamos la capacidad de construir
+            soluciones empresariales por contrato.
           </p>
         </motion.div>
 

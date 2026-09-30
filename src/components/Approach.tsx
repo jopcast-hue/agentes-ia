@@ -51,21 +51,22 @@ const Approach = () => {
               con tu crecimiento.
             </p>
 
-            {/* Case Study */}
+            {/* Product available */}
             <div className="p-6 rounded-2xl glass-card gradient-border">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-3 h-3 rounded-full bg-primary animate-pulse" />
                 <span className="text-sm font-medium text-primary">
-                  Caso de Éxito
+                  Producto disponible
                 </span>
               </div>
               <h4 className="text-lg font-semibold mb-2 text-foreground">
-                Plataforma de Gestión Gastronómica
+                Restaurante Hub
               </h4>
               <p className="text-muted-foreground text-sm leading-relaxed">
-                Sistema Single-Tenant que unifica POS, gestión de cocina y
-                atención al cliente vía WhatsApp en tiempo real. Incremento del
-                40% en eficiencia operativa para nuestro cliente.
+                Plataforma SaaS multitenant que conecta POS, KDS, mesas,
+                inventario, facturación SRI y atención por WhatsApp. Puedes
+                probar el Agente Vendedor y solicitar una demostración temporal
+                del sistema.
               </p>
             </div>
           </motion.div>
