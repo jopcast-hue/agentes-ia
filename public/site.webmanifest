@@ -3,8 +3,8 @@
   "short_name": "Agentes IA",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0d0f14",
-  "theme_color": "#0d0f14",
+  "background_color": "#F6F5EF",
+  "theme_color": "#F6F5EF",
   "icons": [
     {
       "src": "/icon-192x192.png",

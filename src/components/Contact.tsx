@@ -47,10 +47,7 @@ const Contact = () => {
   };
 
   return (
-    <section id="contacto" className="relative py-24 lg:py-32">
-      {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-t from-muted/50 via-transparent to-transparent pointer-events-none" />
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[800px] h-[400px] bg-gradient-radial from-primary/10 via-secondary/5 to-transparent blur-3xl pointer-events-none" />
+    <section id="contacto" className="section-space bg-white border-t border-border">
 
       <div className="container mx-auto px-4 lg:px-8 relative z-10">
         {/* Section Header */}
@@ -62,11 +59,10 @@ const Contact = () => {
           className="text-center mb-16"
         >
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-            ¿Listo para <span className="text-gradient">escalar</span> tu negocio?
+            Cuéntanos qué quieres <span className="text-primary">mejorar.</span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Conversemos sobre cómo podemos transformar tus procesos con
-            tecnología inteligente.
+            Podemos empezar con un diagnóstico gratuito o mostrarte cómo funciona Restaurante Hub.
           </p>
         </motion.div>
 
@@ -84,8 +80,7 @@ const Contact = () => {
                 Información de Contacto
               </h3>
               <p className="text-muted-foreground mb-8">
-                Estamos listos para escuchar tu proyecto y crear la solución
-                perfecta para tu negocio.
+                Escríbenos sobre tu operación, tus objetivos o las tareas que hoy te toman más tiempo.
               </p>
             </div>
 
@@ -93,10 +88,10 @@ const Contact = () => {
             <div className="space-y-4">
               <a
                 href="mailto:contacto@agentesia.lat"
-                className="flex items-center gap-4 p-5 rounded-xl glass-card group hover:scale-[1.02] transition-all duration-300"
+                className="flex items-center gap-4 p-5 rounded-xl surface-card group transition-colors hover:border-primary/40"
               >
-                <div className="w-14 h-14 rounded-xl bg-gradient-primary flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                  <Mail className="w-6 h-6 text-primary-foreground" />
+                <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <Mail className="w-6 h-6 text-primary" />
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">Email</p>
@@ -108,10 +103,10 @@ const Contact = () => {
 
               <a
                 href="tel:+593986827024"
-                className="flex items-center gap-4 p-5 rounded-xl glass-card group hover:scale-[1.02] transition-all duration-300"
+                className="flex items-center gap-4 p-5 rounded-xl surface-card group transition-colors hover:border-primary/40"
               >
-                <div className="w-14 h-14 rounded-xl bg-gradient-primary flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                  <Phone className="w-6 h-6 text-primary-foreground" />
+                <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <Phone className="w-6 h-6 text-primary" />
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">Teléfono</p>
@@ -125,10 +120,10 @@ const Contact = () => {
                 href="https://wa.me/593986827024"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-4 p-5 rounded-xl glass-card group hover:scale-[1.02] transition-all duration-300"
+                className="flex items-center gap-4 p-5 rounded-xl surface-card group transition-colors hover:border-primary/40"
               >
-                <div className="w-14 h-14 rounded-xl bg-gradient-primary flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                  <MessageCircle className="w-6 h-6 text-primary-foreground" />
+                <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center">
+                  <MessageCircle className="w-6 h-6 text-primary" />
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">WhatsApp</p>
@@ -150,7 +145,7 @@ const Contact = () => {
             <form
               onSubmit={handleSubmit}
               noValidate
-              className="p-8 rounded-2xl glass-card gradient-border relative z-10"
+              className="p-8 rounded-2xl surface-card relative z-10"
               style={{ isolation: 'isolate' }}
             >
               <h3 className="text-xl font-bold mb-6 text-foreground">
@@ -218,7 +213,7 @@ const Contact = () => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 rounded-lg bg-gradient-primary text-primary-foreground font-semibold text-lg transition-all duration-300 hover:scale-[1.02] glow-button disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 relative z-10"
+                  className="w-full button-primary justify-center disabled:opacity-50 disabled:cursor-not-allowed relative z-10"
                 >
                   {isSubmitting ? (
                     <>

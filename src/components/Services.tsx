@@ -1,127 +1,28 @@
-import { motion } from "framer-motion";
-import { UtensilsCrossed, MessageCircle, PackageSearch, Workflow } from "lucide-react";
+import { ArrowUpRight, ClipboardList, Store, Workflow } from "lucide-react";
+
+const whatsapp = "https://wa.me/593986827024?text=";
 
 const services = [
-  {
-    icon: UtensilsCrossed,
-    title: "ERP y facturación para restaurantes",
-    description:
-      "POS, comandas, mesas, KDS, recetas y facturación electrónica SRI conectados con la operación diaria.",
-    tags: ["POS", "KDS", "SRI"],
-  },
-  {
-    icon: MessageCircle,
-    title: "Agente Vendedor por WhatsApp",
-    description:
-      "Atiende consultas, presenta productos y convierte conversaciones en pedidos registrados dentro del sistema.",
-    tags: ["WhatsApp", "Ventas", "Fidelización"],
-  },
-  {
-    icon: PackageSearch,
-    title: "Agente de Inventario",
-    description:
-      "Registra compras desde conversaciones o documentos, conecta recetas con existencias y prepara cambios para aprobación humana.",
-    tags: ["Inventario", "Recetas", "Aprobaciones"],
-  },
-  {
-    icon: Workflow,
-    title: "Sistematización y software a medida",
-    description:
-      "Analizamos procesos, responsabilidades y datos para decidir qué conviene documentar, integrar, automatizar o construir.",
-    tags: ["Procesos", "Agentes", "Desarrollo"],
-  },
+  { number: "01", icon: ClipboardList, title: "Diagnóstico de sistematización", description: "Miramos cómo funciona hoy tu empresa: procesos, responsables, herramientas y puntos de fricción. Recibes una lectura inicial para decidir por dónde empezar.", note: "Primer diagnóstico gratuito", link: `${whatsapp}${encodeURIComponent("Hola, quiero solicitar el diagnóstico gratuito de sistematización para mi empresa.")}`, action: "Solicitar diagnóstico" },
+  { number: "02", icon: Store, title: "Sistema para restaurantes", description: "Restaurante Hub reúne mostrador, comandas, mesas, cocina, inventario y facturación. Sus agentes ayudan a atender, vender y organizar la operación.", note: "Producto disponible", link: "#restaurante", action: "Conocer Restaurante Hub" },
+  { number: "03", icon: Workflow, title: "Soluciones para tu operación", description: "Diseñamos aplicaciones, agentes e integraciones según el proceso real de tu empresa. El alcance se define después de comprender qué necesitas resolver.", note: "Proyectos a medida", link: `${whatsapp}${encodeURIComponent("Hola, quiero conversar sobre una solución para los procesos de mi empresa.")}`, action: "Conversemos" },
 ];
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.15,
-    },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 40 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6 },
-  },
-};
-
-const Services = () => {
-  return (
-    <section id="soluciones" className="relative py-24 lg:py-32">
-      {/* Background */}
-      <div className="absolute inset-0 bg-gradient-radial from-secondary/5 via-transparent to-transparent" />
-
-      <div className="container mx-auto px-4 lg:px-8 relative z-10">
-        {/* Section Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
-        >
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-            ¿Qué <span className="text-gradient">hacemos</span>?
-          </h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Empezamos con restaurantes y conservamos la capacidad de construir
-            soluciones empresariales por contrato.
-          </p>
-        </motion.div>
-
-        {/* Services Grid */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8"
-        >
-          {services.map((service, index) => (
-            <motion.div
-              key={index}
-              variants={itemVariants}
-              className="group relative p-6 lg:p-8 rounded-2xl glass-card gradient-border transition-all duration-500 hover:scale-[1.02]"
-            >
-              {/* Icon */}
-              <div className="w-14 h-14 rounded-xl bg-gradient-primary flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                <service.icon className="w-7 h-7 text-primary-foreground" />
-              </div>
-
-              {/* Content */}
-              <h3 className="text-xl lg:text-2xl font-bold mb-3 text-foreground">
-                {service.title}
-              </h3>
-              <p className="text-muted-foreground mb-5 leading-relaxed">
-                {service.description}
-              </p>
-
-              {/* Tags */}
-              <div className="flex flex-wrap gap-2">
-                {service.tags.map((tag, tagIndex) => (
-                  <span
-                    key={tagIndex}
-                    className="px-3 py-1 rounded-full text-xs font-medium bg-muted text-muted-foreground"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-
-              {/* Hover Glow */}
-              <div className="absolute inset-0 rounded-2xl bg-gradient-primary opacity-0 group-hover:opacity-5 transition-opacity duration-500 pointer-events-none" />
-            </motion.div>
-          ))}
-        </motion.div>
+const Services = () => (
+  <section id="soluciones" className="section-space bg-white border-y border-border">
+    <div className="container mx-auto px-4 lg:px-8">
+      <div className="section-heading"><span className="eyebrow">QUÉ HACEMOS</span><h2>Del problema a una operación <span className="text-primary">mejor conectada.</span></h2><p>Una forma de empezar para cada empresa: comprender, implementar o desarrollar lo que su operación necesita.</p></div>
+      <div className="grid md:grid-cols-3 gap-5 mt-12">
+        {services.map((service) => <article key={service.number} className="service-card">
+          <div className="flex items-start justify-between"><span className="service-icon"><service.icon size={24} strokeWidth={1.8} /></span><span className="text-xs font-semibold text-muted-foreground">{service.number}</span></div>
+          <p className="mt-10 text-xs font-semibold tracking-widest text-primary uppercase">{service.note}</p>
+          <h3 className="mt-3 text-2xl font-semibold tracking-tight">{service.title}</h3>
+          <p className="mt-4 text-muted-foreground leading-relaxed flex-1">{service.description}</p>
+          <a href={service.link} target={service.link.startsWith("http") ? "_blank" : undefined} rel={service.link.startsWith("http") ? "noopener noreferrer" : undefined} className="service-link">{service.action}<ArrowUpRight size={17} /></a>
+        </article>)}
       </div>
-    </section>
-  );
-};
+    </div>
+  </section>
+);
 
 export default Services;

@@ -7,8 +7,6 @@ import Footer from "@/components/Footer";
 const PrivacyPolicy = () => {
   return (
     <div className="min-h-screen bg-background overflow-x-hidden relative">
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-muted/20 to-transparent" />
-      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl pointer-events-none" />
       <Header />
 
       <main className="container mx-auto px-4 lg:px-8 relative z-10 pt-32 pb-24">
@@ -32,7 +30,7 @@ const PrivacyPolicy = () => {
           className="mb-12 max-w-3xl"
         >
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Política de <span className="text-gradient">privacidad</span>
+            Política de <span className="text-primary">privacidad</span>
           </h1>
           <p className="text-muted-foreground text-lg">
             Información sobre el tratamiento de datos personales en el sitio,
@@ -46,7 +44,7 @@ const PrivacyPolicy = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="glass-card rounded-2xl p-8 md:p-12 border border-border shadow-2xl space-y-10 max-w-5xl"
+          className="surface-card rounded-2xl p-8 md:p-12 space-y-10 max-w-5xl"
         >
           <PolicySection icon={Shield} title="Responsable del tratamiento">
             <p>
@@ -151,8 +149,8 @@ type PolicySectionProps = {
 const PolicySection = ({ icon: Icon, title, children }: PolicySectionProps) => (
   <section className="space-y-4">
     <div className="flex items-center gap-3">
-      <div className="w-10 h-10 rounded-lg bg-gradient-primary flex items-center justify-center">
-        <Icon className="w-5 h-5 text-primary-foreground" />
+      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+        <Icon className="w-5 h-5 text-primary" />
       </div>
       <h2 className="text-xl md:text-2xl font-bold text-foreground">{title}</h2>
     </div>

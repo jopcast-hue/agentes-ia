@@ -1,109 +1,27 @@
-import { motion } from "framer-motion";
-import { Layers, Clock, Zap, Shield } from "lucide-react";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
 
-const features = [
-  {
-    icon: Layers,
-    title: "Análisis Profundo",
-    description: "Estudiamos cada aspecto de tu negocio antes de escribir una sola línea de código.",
-  },
-  {
-    icon: Clock,
-    title: "Operación 24/7",
-    description: "Sistemas que trabajan sin descanso, automatizando procesos día y noche.",
-  },
-  {
-    icon: Zap,
-    title: "Integración Total",
-    description: "Conectamos todas tus herramientas en un ecosistema unificado.",
-  },
-  {
-    icon: Shield,
-    title: "Seguridad Primero",
-    description: "Arquitecturas robustas con las mejores prácticas de seguridad.",
-  },
-];
+const whatsapp = "https://wa.me/593986827024?text=";
 
-const Approach = () => {
-  return (
-    <section id="enfoque" className="relative py-24 lg:py-32 overflow-hidden">
-      {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-muted/30 to-transparent" />
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-secondary/5 rounded-full blur-3xl" />
-
-      <div className="container mx-auto px-4 lg:px-8 relative z-10">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          {/* Left Content */}
-          <motion.div
-            initial={{ opacity: 0, x: -40 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
-              Más que código, creamos{" "}
-              <span className="text-gradient">ecosistemas</span>
-            </h2>
-            <p className="text-muted-foreground text-lg mb-8 leading-relaxed">
-              No solo entregamos software, realizamos un análisis profundo de tu
-              negocio para implementar soluciones que funcionan 24/7 y escalan
-              con tu crecimiento.
-            </p>
-
-            {/* Product available */}
-            <div className="p-6 rounded-2xl glass-card gradient-border">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-3 h-3 rounded-full bg-primary animate-pulse" />
-                <span className="text-sm font-medium text-primary">
-                  Producto disponible
-                </span>
-              </div>
-              <h4 className="text-lg font-semibold mb-2 text-foreground">
-                Restaurante Hub
-              </h4>
-              <p className="text-muted-foreground text-sm leading-relaxed">
-                Plataforma SaaS multitenant que conecta POS, KDS, mesas,
-                inventario, facturación SRI y atención por WhatsApp. Puedes
-                probar el Agente Vendedor y solicitar una demostración temporal
-                del sistema.
-              </p>
-            </div>
-          </motion.div>
-
-          {/* Right Content - Features Grid */}
-          <motion.div
-            initial={{ opacity: 0, x: 40 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="grid grid-cols-2 gap-4 lg:gap-6"
-          >
-            {features.map((feature, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: 0.1 * index }}
-                className="p-5 lg:p-6 rounded-xl glass-card group hover:scale-105 transition-all duration-300"
-              >
-                <div className="w-12 h-12 rounded-lg bg-gradient-primary flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                  <feature.icon className="w-6 h-6 text-primary-foreground" />
-                </div>
-                <h4 className="font-semibold mb-2 text-foreground">
-                  {feature.title}
-                </h4>
-                <p className="text-sm text-muted-foreground">
-                  {feature.description}
-                </p>
-              </motion.div>
-            ))}
-          </motion.div>
+const Approach = () => (
+  <>
+    <section id="enfoque" className="section-space">
+      <div className="container mx-auto px-4 lg:px-8 grid lg:grid-cols-[.8fr_1.2fr] gap-12 lg:gap-24">
+        <div><span className="eyebrow">NUESTRO ENFOQUE</span><h2 className="mt-5 text-4xl lg:text-5xl font-semibold tracking-tight leading-tight">Primero entendemos. <span className="text-primary">Después conectamos.</span></h2><p className="mt-6 text-lg text-muted-foreground leading-relaxed">Sistematizar una empresa también significa aclarar responsabilidades, documentar procedimientos y mejorar cómo se toman las decisiones. La tecnología entra donde realmente ayuda.</p></div>
+        <div className="approach-list">
+          <div><span>01</span><article><h3>Observamos la operación actual</h3><p>Personas, canales, procesos, herramientas y traspasos entre áreas.</p></article></div>
+          <div><span>02</span><article><h3>Identificamos lo que frena el trabajo</h3><p>Pasos manuales, información dispersa, demoras y oportunidades concretas.</p></article></div>
+          <div><span>03</span><article><h3>Proponemos el siguiente paso</h3><p>Procedimientos, software, agentes o automatizaciones, según el caso.</p></article></div>
         </div>
       </div>
     </section>
-  );
-};
+
+    <section id="restaurante" className="product-section section-space">
+      <div className="container mx-auto px-4 lg:px-8 grid lg:grid-cols-[.9fr_1.1fr] gap-12 lg:gap-20 items-center">
+        <div className="product-mark"><div className="product-mark-inner"><img src="/restaurante-hub-logo.png" width="128" height="128" alt="Icono de Restaurante Hub" /><span>RESTAURANTE HUB</span><strong>La operación del restaurante, en un solo lugar.</strong></div></div>
+        <div><span className="eyebrow eyebrow-orange">SISTEMA PARA RESTAURANTES</span><h2 className="mt-5 text-4xl lg:text-5xl font-semibold tracking-tight leading-tight">Del pedido a la cocina. <span className="text-[#D95511]">Todo conectado.</span></h2><p className="mt-6 text-lg text-muted-foreground leading-relaxed">Restaurante Hub conecta el mostrador, las comandas, el mapa de mesas, la pantalla de cocina y el inventario. Incluye facturación electrónica y agentes que apoyan tareas de venta y operación.</p><div className="mt-7 grid sm:grid-cols-2 gap-3">{["POS y comandas", "Mesas y cocina KDS", "Inventario y recetas", "Agente vendedor por WhatsApp"].map(item => <div key={item} className="flex items-center gap-2 text-sm font-medium"><CheckCircle2 size={18} className="text-[#D95511]" />{item}</div>)}</div><div className="mt-9 flex flex-col sm:flex-row gap-3"><a className="button-primary product-button" href={`${whatsapp}${encodeURIComponent("Hola, quiero conocer y probar el agente vendedor de Restaurante Hub.")}`} target="_blank" rel="noopener noreferrer">Probar el agente vendedor <ArrowRight size={18} /></a><a className="button-secondary" href={`${whatsapp}${encodeURIComponent("Hola, quisiera solicitar una demostración de Restaurante Hub para mi restaurante.")}`} target="_blank" rel="noopener noreferrer">Solicitar demostración</a></div></div>
+      </div>
+    </section>
+  </>
+);
 
 export default Approach;
