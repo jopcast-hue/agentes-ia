@@ -1,0 +1,1141 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Restaurante Hub · pedido, cocina y atención</title>
+<!-- Dependencias: ninguna. Sin Internet, sin fuentes externas, sin imágenes externas.
+     La voz opcional usa speechSynthesis del navegador (voz de prueba). -->
+<style>
+/* ========= Página y controles (FUERA del lienzo 9:16) ========= */
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:Inter,"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;background:#14171C;color:#111318;-webkit-font-smoothing:antialiased}
+.grow{flex:1}
+#app{display:flex;height:100vh;gap:0}
+#holder{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;background:#14171C;padding:12px}
+#frame{position:relative;overflow:hidden;border-radius:6px;box-shadow:0 20px 60px rgba(0,0,0,.5);background:#F6F5EF}
+#controls{width:320px;flex:none;background:#1C2027;color:#E8ECF1;padding:18px 18px 22px;overflow:auto;display:flex;flex-direction:column;gap:14px;font-size:14px}
+#controls h1{font-size:15px;font-weight:800;letter-spacing:.01em;color:#fff}
+#controls h1 small{display:block;font-weight:500;color:#9AA6B3;font-size:12px;margin-top:3px;line-height:1.35}
+.row{display:flex;gap:8px;align-items:center}
+.btn{background:#2A303A;color:#fff;border:0;border-radius:10px;padding:10px 14px;font:inherit;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.btn:hover{background:#343B47}
+.btn.pri{background:#FF6A1F}.btn.pri:hover{background:#ff7d3a}
+#seek{width:100%;accent-color:#FF6A1F}
+#time{font-variant-numeric:tabular-nums;color:#B9C3CF;font-size:13px}
+.chk{display:flex;gap:8px;align-items:center;cursor:pointer}
+.note{font-size:12px;color:#9AA6B3;line-height:1.4}
+#script{display:none;background:#14171C;border-radius:10px;padding:10px 12px;font-size:12.5px;line-height:1.5;color:#CBD3DC;max-height:280px;overflow:auto}
+#script p{margin:0 0 7px}#script p.on{color:#fff;font-weight:700}
+#script span{color:#FF9A66;font-variant-numeric:tabular-nums;margin-right:6px}
+@media (max-width:860px){
+  #app{flex-direction:column;height:auto;min-height:100vh}
+  #holder{flex:none;height:78vh}
+  #controls{width:auto}
+}
+#holder:fullscreen{background:#000;padding:0}
+
+/* ========= Lienzo 1080 x 1920 ========= */
+#stage{position:absolute;left:0;top:0;width:1080px;height:1920px;transform-origin:0 0;background:#F6F5EF;overflow:hidden}
+#vp{position:absolute;left:0;top:0;width:1080px;height:1700px;overflow:hidden;background:#F6F5EF}
+#world{position:absolute;left:0;top:0;width:0;height:0;transform-origin:0 0;will-change:transform}
+#band{position:absolute;left:0;top:1700px;width:1080px;height:220px;background:#fff;border-top:3px solid #D3D9E0;display:flex;align-items:center;justify-content:center}
+#sub{width:960px;text-align:center;font-size:44px;line-height:1.22;font-weight:700;color:#111318;letter-spacing:-.005em;opacity:0;text-wrap:balance}
+#closing{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;opacity:0}
+#closing .lg{display:flex;align-items:center;gap:18px;font-size:64px;font-weight:800;letter-spacing:-.02em}
+#closing .lg .logo{flex:none;display:block}
+#closing p{font-size:36px;font-weight:600;color:#59636F}
+
+/* ========= Ambiente ========= */
+.ambient{position:absolute;left:0;top:0}
+.ambient>*{position:absolute}
+.wall{left:-1400px;width:3880px}
+.wall.tile{background-color:#EDF3F2;background-image:linear-gradient(#C9D4D6 3px,transparent 3px),linear-gradient(90deg,#C9D4D6 3px,transparent 3px);background-size:120px 64px}
+.wall.cream{background:#F1EEE4}
+.wall.cream2{background:#F4F1E8;background-image:linear-gradient(90deg,rgba(0,0,0,.025) 2px,transparent 2px);background-size:140px 100%}
+.wains{left:-1400px;width:3880px;background:#E5E0D1;border-top:6px solid #D8D2BF}
+.ctr-top{left:-1400px;width:3880px;background:#CF9A66;border-top:8px solid #E6BC8C}
+.ctr-top.m{background:#D4A26E}
+.ctr-front{left:-1400px;width:3880px;background:#9C6B3F;background-image:linear-gradient(90deg,rgba(0,0,0,.12) 3px,transparent 3px);background-size:180px 100%}
+.pass-top{left:-1400px;width:3880px;top:817px;height:44px;background:#CBD3DA;border-top:6px solid #EAEFF3}
+.pass-front{left:-1400px;width:3880px;top:861px;height:190px;background:#AEB8C0;background-image:linear-gradient(90deg,rgba(255,255,255,.22) 4px,transparent 4px);background-size:240px 100%}
+.board{width:440px;padding:34px 34px 38px;background:#2E3B36;border:14px solid #B8885A;border-radius:12px;color:#F1F4EE;font-weight:600;font-size:26px;display:flex;flex-direction:column;gap:16px;transform:rotate(-1.2deg)}
+.board b{font-size:44px;letter-spacing:.01em;color:#FFD9B8;margin-bottom:6px}
+.shelf{width:520px;height:22px;background:#B8885A;border-radius:4px;box-shadow:0 8px 0 rgba(0,0,0,.08)}
+
+/* ========= Teléfono ========= */
+.phone{position:absolute;left:143px;top:2150px;width:418px;height:828px;transform:scale(1.9);transform-origin:0 0;background:#14161B;border-radius:58px;padding:14px;box-shadow:inset 0 0 0 2px #2B2F38,0 30px 60px rgba(17,19,24,.3)}
+.island{position:absolute;left:50%;top:22px;width:92px;height:26px;margin-left:-46px;border-radius:14px;background:#000;z-index:60}
+.ph-screen{position:relative;width:390px;height:800px;border-radius:46px;overflow:hidden;background:#F7F8FA;font-size:14px;color:#111318}
+.statusbar{position:absolute;left:0;right:0;top:0;height:30px;display:flex;align-items:center;padding:8px 30px 0 32px;font-size:13px;z-index:55;background:#F7F8FA;gap:5px}
+.statusbar .sig4{width:16px;height:10px;background:linear-gradient(90deg,#111318 3px,transparent 3px) 0 0/5px 100%;display:block;clip-path:polygon(0 100%,100% 100%,100% 0)}
+.statusbar .batt{width:22px;height:11px;border:1.6px solid #111318;border-radius:3px;position:relative;display:block}
+.statusbar .batt:after{content:"";position:absolute;left:1.5px;top:1.5px;bottom:1.5px;width:70%;background:#111318;border-radius:1px}
+.scr{position:absolute;left:0;right:0;top:30px;bottom:64px;overflow:hidden;display:none;background:#F7F8FA}
+.ic{flex:none;display:block}
+.searchrow{display:flex;gap:8px;padding:8px 12px 0}
+.search{flex:1;height:44px;border-radius:14px;background:#fff;border:1px solid #E1E5EA;display:flex;align-items:center;gap:8px;padding:0 12px;color:#7E8895;font-size:13px;white-space:nowrap;overflow:hidden}
+.sqbtn{width:44px;height:44px;border-radius:14px;background:#fff;border:1px solid #E1E5EA;display:flex;align-items:center;justify-content:center;color:#3A424D}
+.sec-title{font-weight:800;font-size:12px;letter-spacing:.03em;color:#FF6A1F;margin:14px 14px 8px;padding-bottom:5px;border-bottom:1px solid #E5E8EC}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 12px}
+.card{background:#fff;border-radius:16px;padding:7px;border:1px solid #EDEFF2;box-shadow:0 1px 3px rgba(17,19,24,.05);transform-origin:50% 50%}
+.card.flash{box-shadow:0 0 0 3px rgba(255,106,31,.5)}
+.card .img{height:88px;border-radius:11px;overflow:hidden;position:relative;background:#EEF0F2}
+.img svg{width:100%;height:100%;display:block}
+.chip{position:absolute;left:6px;top:6px;background:#fff;border-radius:999px;padding:3px 9px;font-weight:800;font-size:9.5px;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.pname{font-weight:700;font-size:13.5px;margin:7px 3px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pprice{font-weight:800;font-size:17px;margin:5px 3px 3px}
+.fab{position:absolute;right:18px;bottom:84px;width:62px;height:62px;border-radius:50%;background:#FF6A1F;color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(255,106,31,.42),0 0 0 6px rgba(255,106,31,.18);z-index:30}
+.fab.sm{bottom:16px;position:absolute;z-index:5}
+.fab .mic{position:absolute;left:-4px;top:-14px;width:28px;height:28px;border-radius:50%;background:#fff;color:#FF6A1F;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.fab .badge{position:absolute;right:-6px;top:-6px;min-width:24px;height:24px;border-radius:12px;background:#111318;color:#fff;font-weight:800;font-size:13px;border:2px solid #fff;display:flex;align-items:center;justify-content:center}
+.nav{position:absolute;left:0;right:0;bottom:0;height:64px;background:#fff;border-top:1px solid #E8EAEE;display:flex;z-index:40;padding-bottom:6px}
+.nav>div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#9AA3AE;font-size:10.5px;font-weight:700;position:relative}
+.nav>div.on{color:#FF6A1F}
+.nav>div.on:before{content:"";position:absolute;top:-1px;left:50%;margin-left:-20px;width:40px;height:3px;border-radius:2px;background:#FF6A1F}
+.scrim{position:absolute;inset:0;background:#111318;opacity:0;z-index:65;visibility:hidden}
+.sheet{position:absolute;left:0;right:0;bottom:0;z-index:70;background:#fff;border-radius:26px 26px 0 0;padding:10px 18px 20px;box-shadow:0 -12px 40px rgba(0,0,0,.2);visibility:hidden;transform:translateY(100%)}
+.grab{width:42px;height:4px;border-radius:2px;background:#D3D9E0;margin:0 auto 12px}
+.sh-head{display:flex;gap:12px;align-items:center;margin-bottom:8px}
+.sh-img{width:84px;height:62px;border-radius:12px;overflow:hidden;flex:none}
+.sh-img svg{width:100%;height:100%;display:block}
+.sh-title{font-weight:800;font-size:17px}.sh-title.big{font-size:20px;margin-bottom:10px}
+.sh-price{font-weight:800;font-size:18px;color:#FF6A1F;margin-top:2px}
+.sh-label{font-weight:800;font-size:11px;letter-spacing:.06em;color:#59636F;text-transform:uppercase;margin:11px 0 6px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.opt{height:38px;padding:0 16px;border-radius:12px;border:1.5px solid #D3D9E0;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-weight:700;font-size:13.5px;color:#111318;background:#fff}
+.opt.on{background:#FFF0E4;border-color:#FF6A1F;color:#C74A0A}
+.chips.seats .opt{width:54px;padding:0}
+.opt.wide{min-width:200px;justify-content:flex-start;color:#59636F}.opt.on.wide{color:#C74A0A}
+.btn-main{height:52px;border-radius:16px;background:#FF6A1F;color:#fff;font-weight:800;font-size:16px;display:flex;align-items:center;justify-content:center;margin-top:16px;box-shadow:0 6px 16px rgba(255,106,31,.35)}
+.btn-main.off{background:#E5E8EC;color:#9AA3AE;box-shadow:none}
+.seg2{display:flex;background:#F0F2F5;border-radius:12px;padding:4px;gap:4px}
+.seg2 span{flex:1;text-align:center;padding:8px;border-radius:9px;font-weight:700;font-size:13px;color:#59636F}.seg2 .on{background:#fff;color:#111318;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.cl{margin-top:10px;background:#F7F8FA;border-radius:12px;padding:10px 12px}
+.seatlbl{font-weight:800;font-size:10.5px;letter-spacing:.06em;color:#FF6A1F}
+.crw{display:flex;justify-content:space-between;align-items:flex-start;margin-top:3px}.crw b{font-size:14px}.crw small{display:block;color:#59636F;font-size:12px;margin-top:1px}
+.tot{display:flex;justify-content:space-between;align-items:center;margin-top:12px;font-weight:800;font-size:12px;letter-spacing:.06em;color:#59636F}.tot b{font-size:26px;color:#111318;letter-spacing:0}
+.toast{position:absolute;left:50%;top:40px;width:330px;transform:translateX(-50%);background:#111318;color:#fff;border-radius:18px;padding:12px 14px;display:flex;align-items:center;gap:12px;z-index:90;opacity:0;box-shadow:0 12px 30px rgba(0,0,0,.3)}
+.toast b{font-size:14px;display:block}.toast small{color:#B9C3CF;font-size:12px}
+.toast .tk{width:34px;height:34px;border-radius:50%;background:#12B76A;display:flex;align-items:center;justify-content:center;flex:none}
+/* Ventas */
+.vtabs{margin:8px 12px 0;background:#fff;border-radius:18px;padding:6px;display:flex;gap:4px;box-shadow:0 1px 4px rgba(17,19,24,.07)}
+.vtabs span{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;height:38px;border-radius:14px;font-weight:700;font-size:13px;color:#59636F}
+.vtabs .on{background:#FF6A1F;color:#fff}
+.h-hist{font-weight:800;font-size:16px;margin:14px 14px 10px}
+.vcard{margin:0 12px 10px;background:#fff;border:1px solid #E7EAEE;border-radius:16px;padding:12px 13px;display:flex;justify-content:space-between;gap:8px}
+.vcard.new{border-color:#FF6A1F;box-shadow:0 0 0 calc(var(--glow,0)*6px) rgba(255,106,31,.35)}
+.vtop{display:flex;align-items:center;gap:6px}
+.vid{font-weight:800;font-size:12px}
+.vst{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:3px 8px;font-weight:700;font-size:11px}
+.vst.prep{background:#FFF1D6;color:#B25E09}.vst.ready{background:#DCE9FF;color:#2754C5}.vst.done{background:#D6F5E5;color:#0C8A4F}
+.vwho{display:inline-flex;align-items:center;gap:3px;background:#F0F2F5;border-radius:999px;padding:3px 8px;font-size:11px;font-weight:600;color:#59636F}
+.vname{font-weight:800;font-size:16px;margin-top:6px}.vsub{color:#59636F;font-size:12px;margin-top:1px}.vitems{color:#59636F;font-size:12px;margin-top:3px}
+.vr{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:5px}.vtotal{font-weight:800;font-size:22px}.vdate{color:#7E8895;font-size:11px;white-space:nowrap}
+.fact{display:inline-flex;align-items:center;gap:3px;border:1px solid #9FE0BD;background:#E8FAF1;color:#0C8A4F;border-radius:999px;padding:2px 8px;font-size:10.5px;font-weight:700}
+/* CRM / Agentes */
+.crow{display:flex;align-items:center;gap:12px;padding:10px 14px;position:relative}
+.crow.hl{background:#FFF0E4}
+.av{width:48px;height:48px;border-radius:50%;background:#F0F1F3;display:flex;align-items:center;justify-content:center;font-weight:700;color:#3A424D;position:relative;flex:none;font-size:15px}
+.av.bot{color:#4A525D}.av.s{width:38px;height:38px;font-size:13px}
+.sdot{position:absolute;right:0;bottom:1px;width:11px;height:11px;border-radius:50%;border:2px solid #F7F8FA}.sdot.g{background:#12B76A}.sdot.o{background:#FF6A1F}.sdot.inl{position:static;display:inline-block;margin-right:5px;border:0;width:7px;height:7px}
+.cm{flex:1;min-width:0}.cn{font-weight:700;font-size:15px}.cp{color:#6B7580;font-size:12.5px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cr{text-align:right;flex:none}.cd{font-size:11.5px;color:#7E8895}.c0{font-size:16px;color:#3A424D;margin-top:3px}
+.cb{margin-top:3px;min-width:22px;height:22px;border-radius:11px;background:#FF6A1F;color:#fff;font-weight:800;font-size:12px;display:inline-flex;align-items:center;justify-content:center;padding:0 6px}
+.ahead{display:flex;align-items:center;gap:10px;padding:10px 14px 4px;font-size:16px}
+.alogo{color:#FF6A1F;display:flex}.avatar{width:42px;height:42px;border-radius:50%;background:#FF6A1F;color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center}
+.arow .cn{font-size:15.5px}
+/* Chats */
+.chead{height:58px;background:#fff;border-bottom:1px solid #E8EAEE;display:flex;align-items:center;gap:10px;padding:0 12px;color:#3A424D}
+.ct b{display:block;font-size:15px;color:#111318}.ct small{color:#59636F;font-size:11.5px;display:flex;align-items:center}
+.msgs{position:absolute;left:0;right:0;top:58px;bottom:62px;padding:12px;display:flex;flex-direction:column;justify-content:flex-end;gap:9px;overflow:hidden}
+.msg{max-width:84%;padding:9px 12px;border-radius:16px;font-size:13px;line-height:1.38}
+.msg em{display:block;font-style:normal;font-size:10.5px;font-weight:800;letter-spacing:.03em;color:#C74A0A;margin-bottom:3px}
+.msg.in{align-self:flex-start;background:#fff;border:1px solid #E7EAEE;border-bottom-left-radius:5px}
+.msg.out{align-self:flex-end;background:#FFF0E4;border:1px solid #FFD8BC;border-bottom-right-radius:5px}
+.msg.me{align-self:flex-end;background:#FF6A1F;color:#fff;border-bottom-right-radius:5px}
+.msg.photo{padding:5px;display:flex;flex-direction:column;gap:5px}.msg.photo span{font-size:11.5px;padding:0 5px 2px}
+.pimg{width:218px;height:150px;border-radius:12px;overflow:hidden}.pimg svg{width:100%;height:100%;display:block}
+.typing{align-self:flex-start;display:none;gap:4px;background:#fff;border:1px solid #E7EAEE;border-radius:16px;padding:12px 14px}
+.typing i{width:7px;height:7px;border-radius:50%;background:#8A94A0;display:block}
+.msg.reply{max-width:92%}
+.rows{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.rows span{background:#F7F8FA;border:1px solid #E7EAEE;border-radius:10px;padding:6px 9px;display:flex;justify-content:space-between;font-size:12px;color:#3A424D}.rows b{color:#111318}
+.foot{margin-top:8px;display:flex;align-items:center;gap:6px;font-size:11px;color:#0C8A4F;font-weight:700}
+.composer{position:absolute;left:0;right:0;bottom:0;height:62px;background:#fff;border-top:1px solid #E8EAEE;display:flex;align-items:center;gap:8px;padding:0 10px}
+.cin{flex:1;height:40px;border-radius:20px;background:#F0F2F5;display:flex;align-items:center;padding:0 14px;font-size:12.5px;color:#7E8895;white-space:nowrap;overflow:hidden}
+.cin.glow{box-shadow:0 0 0 3px rgba(47,107,255,.4)}
+.cbtn{width:40px;height:40px;border-radius:50%;background:#F0F2F5;color:#3A424D;display:flex;align-items:center;justify-content:center;flex:none}
+.cbtn.glow{background:#E7FAFF;color:#2F6BFF;box-shadow:0 0 0 3px rgba(47,107,255,.4)}
+.csend{width:40px;height:40px;border-radius:50%;background:#FF6A1F;color:#fff;display:flex;align-items:center;justify-content:center;flex:none}.csend.off{background:#E5E8EC;color:#9AA3AE}
+.sigs{position:absolute;left:12px;bottom:70px;display:flex;gap:7px}
+.sig{display:none;align-items:center;gap:5px;background:#E7FAFF;color:#1B49C9;border:1px solid #B8E4F5;border-radius:999px;padding:6px 12px;font-size:12px;font-weight:800;transform-origin:0 100%}
+.touch{position:absolute;left:0;top:0;width:44px;height:44px;z-index:100;pointer-events:none;opacity:0}
+.touch .ring{position:absolute;inset:0;border-radius:50%;background:rgba(47,107,255,.2);border:2.5px solid rgba(255,255,255,.96);box-shadow:0 4px 14px rgba(17,19,24,.35)}
+.touch .dot{position:absolute;inset:0;margin:auto;width:14px;height:14px;border-radius:50%;background:#2F6BFF;box-shadow:0 0 0 3px rgba(255,255,255,.85)}
+.ripple{position:absolute;left:0;top:0;width:60px;height:60px;border-radius:50%;border:3px solid #2F6BFF;opacity:0;z-index:99;pointer-events:none}
+
+/* ========= Tablets ========= */
+.tablet{position:absolute;left:58.5px;width:1204px;height:784px;transform:scale(.8);transform-origin:0 0;background:#14161B;border-radius:38px;padding:12px;box-shadow:inset 0 0 0 2px #2B2F38,0 24px 50px rgba(17,19,24,.3)}
+.tablet .cam{position:absolute;left:50%;top:3px;width:6px;height:6px;border-radius:50%;background:#30343D}
+.tb-screen{position:relative;width:1180px;height:760px;border-radius:26px;overflow:hidden;background:#F8F9FB;display:flex;color:#111318;font-size:14px}
+.tb-screen .touch{width:60px;height:60px}.tb-screen .ripple{width:84px;height:84px}
+.side{width:190px;flex:none;background:#fff;border-right:1px solid #E8EAEE;padding:16px 10px 14px;display:flex;flex-direction:column;gap:6px}
+.brand{display:flex;gap:10px;align-items:center;padding:0 4px 8px}
+.brand .bl{width:44px;height:44px;border-radius:14px;background:#FF6A1F;color:#fff;display:flex;align-items:center;justify-content:center;flex:none}
+.brand b{display:block;font-size:15px;font-weight:800}.brand small{color:#FF6A1F;font-weight:700;font-size:11px}
+.adm{align-self:flex-start;background:#FF6A1F;color:#fff;border-radius:999px;font-weight:800;font-size:10.5px;padding:3px 10px;margin:2px 4px 10px;letter-spacing:.04em}
+.ni{display:flex;align-items:center;gap:12px;height:46px;border-radius:14px;padding:0 14px;font-weight:600;font-size:14.5px;color:#2B323B}
+.ni.on{background:#FF6A1F;color:#fff;font-weight:800}
+.col{display:flex;align-items:center;gap:10px;padding:0 10px;color:#3A424D;font-weight:600;font-size:13.5px}
+.mainp{flex:1;position:relative;overflow:hidden;min-width:0}
+.ttabs{margin:12px 16px;background:#fff;border-radius:18px;padding:6px;display:inline-flex;gap:4px;box-shadow:0 1px 4px rgba(17,19,24,.07)}
+.ttabs span{display:flex;align-items:center;gap:8px;height:40px;padding:0 22px;border-radius:14px;font-weight:700;font-size:14.5px;color:#59636F}
+.ttabs .on{background:#FF6A1F;color:#fff}
+.mesas-split{position:absolute;left:0;right:0;top:74px;bottom:0;display:flex;border-top:1px solid #E8EAEE}
+.dpanel{width:336px;flex:none;overflow:hidden;padding:10px 12px;border-right:1px solid #E8EAEE;background:#F8F9FB}
+.dhead{display:flex;align-items:center;gap:12px;padding:8px 6px 12px;color:#3A424D}.dhead b{font-size:19px;color:#111318;display:block}.dhead small{color:#59636F;font-size:12.5px}
+.dst{border:1.5px solid;border-radius:999px;padding:6px 12px;font-weight:700;font-size:12.5px;display:inline-flex;align-items:center;gap:5px}
+.dst.rdy{border-color:#FF6A1F;color:#FF6A1F;background:#fff}.dst.prp{border-color:#F5B335;color:#B25E09;background:#FFF8E6}
+.dcard{background:#fff;border:1px solid #E7EAEE;border-radius:16px;padding:14px;margin-bottom:12px;position:relative}
+.cap{font-weight:800;letter-spacing:.07em;color:#59636F;font-size:11px;display:block;margin-bottom:6px}
+.dcard .tag{position:absolute;right:14px;top:14px;font-size:11px;color:#59636F}
+.big{font-size:18px;display:block}.mut{color:#59636F;margin-top:3px;font-size:13px}.mut b{color:#111318}
+.pin{color:#E5483A;font-weight:700;font-size:12px;margin-top:8px;display:flex;align-items:center;gap:4px}
+.sl{font-weight:800;color:#FF6A1F;font-size:11.5px;letter-spacing:.06em;margin:10px 4px 6px}
+.pi{background:#FAFBFC;border:1px solid #EDEFF2;border-radius:12px;padding:10px 12px}
+.pr1,.pr2{display:flex;justify-content:space-between;align-items:center}.pr1 b{font-size:14px}.pr2{margin-top:6px;padding-top:6px;border-top:1px solid #EDEFF2;gap:10px}.pr2 i{flex:1;color:#6B7580;font-size:12.5px}
+.x1{color:#FF6A1F;font-weight:800;font-size:12px}.pc{color:#FF6A1F}
+.addpos{margin-top:14px;height:50px;border:2px solid #FF6A1F;border-radius:14px;color:#FF6A1F;font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center;gap:8px;background:#fff}
+.dcard.tot{display:flex;justify-content:space-between;align-items:center;font-weight:800;color:#59636F;font-size:13px;letter-spacing:.05em}.dcard.tot b{font-size:34px;color:#111318;letter-spacing:0}
+.gpanel{flex:1;padding:16px 18px;overflow:hidden;min-width:0}
+.gtitle{display:flex;align-items:center;gap:10px;color:#FF6A1F}.gtitle b{font-size:20px;color:#111318}
+.gear{width:38px;height:38px;border-radius:12px;background:#fff;border:1px solid #E1E5EA;display:flex;align-items:center;justify-content:center;color:#3A424D}
+.legend{margin:10px 0 14px;display:flex;align-items:center;gap:7px;font-size:13.5px;font-weight:600;color:#2B323B}
+.legend i,.lg i{width:10px;height:10px;border-radius:50%;display:inline-block;margin-left:10px}.legend i:first-child{margin-left:0}
+i.g{background:#12B76A}i.r{background:#E5483A}i.a{background:#F5A623}
+.mgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.mesa{height:118px;border-radius:16px;border:2px solid;padding:11px 13px;position:relative;display:flex;flex-direction:column;align-items:flex-start;transform-origin:50% 50%}
+.mesa .mn{font-size:17px;font-weight:800}
+.mesa .ms{font-size:10.5px;font-weight:800;letter-spacing:.05em;border-radius:999px;padding:3px 9px;margin:6px 0 7px}
+.mesa .mc{font-size:12px;font-weight:600}.mesa .mt{font-size:22px;font-weight:800;margin-top:2px}
+.mesa .mp{position:absolute;right:14px;bottom:8px;font-style:normal;font-size:20px;display:none}
+.mesa.servida{background:#FFF8E1;border-color:#F5C24D;color:#6B3A07}.mesa.servida .ms{background:#FCEBB8;color:#8A4A08}
+.mesa.ocupada{background:#FFE9E6;border-color:#F2A29B;color:#6E1F18}.mesa.ocupada .ms{background:#FFD3CE;color:#9A2A20}
+.mesa.libre{background:#E7F9F0;border-color:#9FE3C2;color:#0B5B3C}.mesa.libre .ms{background:#C9F2DE;color:#0B6B45}.mesa.libre .mp{display:block;color:#12B76A}
+.mesa.sel{box-shadow:0 0 0 4px rgba(255,106,31,.55)}
+.mesa.fresh{box-shadow:0 0 0 calc(var(--pulse,0)*7px) rgba(229,72,58,.35)}
+.mesa .nueva{display:none;position:absolute;right:10px;top:10px;font-style:normal;background:#E5483A;color:#fff;font-weight:800;font-size:10px;letter-spacing:.06em;border-radius:999px;padding:3px 9px}
+.khead{display:flex;align-items:center;gap:10px;padding:10px 18px;height:62px;border-top:1px solid #E8EAEE;border-bottom:1px solid #E8EAEE;background:#fff;color:#FF6A1F;margin-top:0}
+.khead>b{font-size:20px;color:#111318}
+.khead .lg{font-size:13px;font-weight:600;color:#2B323B;display:flex;align-items:center;gap:5px}.khead .lg i{margin-left:12px}
+.pend{background:#FFEBDD;color:#E0540C;font-weight:800;font-size:13px;border-radius:999px;padding:6px 14px;margin-left:8px}
+.fs{display:inline-flex;border:1px solid #E1E5EA;border-radius:10px;overflow:hidden;margin-left:8px}.fs i{font-style:normal;padding:7px 14px;font-weight:800;font-size:13px;color:#FF6A1F;background:#fff}.fs i.on{background:#FF6A1F;color:#fff}
+.ib{width:40px;height:40px;border-radius:50%;border:1px solid #E1E5EA;display:inline-flex;align-items:center;justify-content:center;color:#FF6A1F}.ib.ring{background:#FFEBDD}
+.alert{position:absolute;left:470px;top:15px}
+.alert{background:#FF6A1F;color:#fff;font-weight:800;font-size:14px;border-radius:14px;padding:10px 16px;display:flex;align-items:center;gap:8px;box-shadow:0 8px 20px rgba(255,106,31,.4);opacity:0;z-index:20}
+.tickets{display:flex;gap:16px;align-items:flex-start;padding:18px 18px}
+.tkt{width:342px;flex:none;background:#fff;border-radius:22px;box-shadow:0 8px 24px rgba(17,19,24,.1);overflow:hidden;border-top:9px solid #12B76A}
+.tkt.fresh{box-shadow:0 8px 24px rgba(17,19,24,.1),0 0 0 calc(var(--glow,0)*7px) rgba(255,106,31,.4)}
+.th{background:#E7F9F0;padding:10px 14px 10px;display:flex;justify-content:space-between;align-items:flex-start}
+.tl small{font-weight:800;font-size:11px;color:#0B8A58;letter-spacing:.07em;display:block}.tl b{display:flex;align-items:center;gap:7px;font-size:22px;font-weight:900;color:#0B5B3C;margin-top:2px}
+.tc{background:#fff;border-radius:14px;padding:6px 12px;text-align:center}.tc small{display:block;font-weight:800;font-size:9.5px;color:#0B8A58;letter-spacing:.08em}.tc b{font-size:28px;font-weight:900;color:#0B5B3C;line-height:1}
+.tm{display:flex;align-items:center;gap:8px;padding:9px 14px;border-bottom:1px solid #EDEFF2;color:#0B8A58;font-size:13px}
+.who{display:inline-flex;align-items:center;gap:4px;background:#F0F2F5;color:#59636F;border-radius:999px;padding:3px 10px;font-weight:700;font-size:11.5px}
+.newtag{margin-left:auto;background:#FF6A1F;color:#fff;font-weight:800;font-size:10.5px;border-radius:999px;padding:3px 10px;letter-spacing:.05em}
+.tbody{padding:8px 14px 4px}
+.seat{border-left:2px solid #FFD8BC;padding-left:12px;margin:6px 0 8px}
+.seat .sl{margin:2px 0 8px}
+.it{display:flex;gap:12px;align-items:flex-start;margin-bottom:9px}
+.it .q{width:30px;height:30px;border-radius:50%;background:#FFF0E4;border:1.5px solid #FFC9A5;color:#E0540C;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none;font-size:14px}
+.it b{font-size:17px;font-weight:800;display:block}.it small{display:block;color:#6B7580;font-size:13.5px;margin-top:1px}
+.it em{display:inline-block;margin-top:5px;background:#FFF0E4;border:1px solid #FFD8BC;color:#C74A0A;font-weight:700;font-size:14px;padding:5px 12px;border-radius:8px}
+.tbtn{margin:6px 14px 14px;height:48px;border:2px solid #FFC9A5;border-radius:14px;color:#E0540C;font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center;gap:8px;background:#fff}
+.tbtn.done{background:#FF6A1F;color:#fff;border-color:#FF6A1F}
+
+/* hilo de agente: deja espacio a las señales de entrada */
+[data-k="th-msgs"]{bottom:100px}
+
+
+/* Derivado silencioso para la sección de Restaurante Hub: lienzo vertical fluido. */
+html,body,#app,#holder{width:100%;height:100%;min-height:0;overflow:hidden}
+#app{display:block}
+#holder{display:flex;padding:0;background:#FFF8F2}
+#frame{border-radius:0;box-shadow:none}
+#vp{height:1920px}
+#band,#controls{display:none}
+#loop-fade{position:absolute;inset:0;z-index:200;pointer-events:none;background:#FFF8F2;opacity:1}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="holder">
+    <div id="frame">
+      <div id="stage">
+        <div id="vp"><div id="world"></div></div>
+        <div id="loop-fade"></div>
+        <div id="band">
+          <div id="sub"></div>
+          <div id="closing"><div class="lg"><svg class="logo" width="92" height="92" viewBox="0 0 1024 1024" role="img" aria-label="Logo Agentes IA"><circle cx="512" cy="512" r="500" fill="#FFF0E4"/><path fill="#FF6A1F" d="M718,582 L661,628 L655,634 L655,639 L662,654 L664,661 L667,666 L667,668 L674,683 L676,690 L679,695 L681,702 L684,707 L686,714 L689,719 L691,726 L694,731 L696,738 L699,743 L701,750 L704,755 L708,767 L716,784 L716,786 L723,801 L725,808 L728,813 L730,820 L733,825 L735,832 L738,837 L741,837 L742,838 L825,837 L825,833 L823,830 L821,823 L818,818 L814,806 L811,801 L807,789 L804,784 L800,772 L797,767 L791,750 L788,745 L784,733 L781,728 L777,716 L774,711 L770,699 L767,694 L763,682 L760,677 L756,665 L753,660 L753,658 L744,638 L742,631 L739,626 L737,619 L734,614 L734,612 L727,597 L725,590 L722,585 L722,583 L721,582Z M545,158 L473,158 L471,159 L469,162 L468,167 L446,220 L445,225 L437,243 L436,248 L428,266 L427,271 L417,294 L416,299 L408,317 L407,322 L399,340 L398,345 L390,363 L389,368 L387,371 L387,373 L381,386 L380,391 L374,404 L373,409 L367,422 L366,427 L360,440 L359,445 L353,458 L352,463 L348,471 L347,476 L343,484 L342,489 L338,497 L332,515 L326,528 L322,541 L318,549 L311,570 L307,578 L306,583 L304,586 L303,591 L299,599 L292,620 L288,628 L287,633 L285,636 L278,657 L274,665 L264,694 L260,702 L256,715 L252,723 L245,744 L241,752 L234,773 L230,781 L223,802 L221,805 L212,831 L210,834 L210,837 L211,838 L294,838 L298,833 L299,828 L303,820 L304,815 L306,812 L310,800 L315,794 L510,670 L515,671 L628,746 L631,747 L642,755 L644,755 L644,752 L642,749 L640,741 L638,738 L637,733 L635,730 L634,725 L632,722 L631,717 L629,714 L628,709 L626,706 L625,701 L623,698 L622,693 L620,690 L619,685 L617,682 L607,653 L597,629 L597,624 L603,618 L608,615 L676,560 L705,538 L705,536 L566,536 L564,535 L559,527 L559,525 L556,520 L554,513 L551,508 L549,501 L546,496 L544,489 L541,484 L539,477 L536,472 L534,465 L531,460 L529,453 L526,448 L524,441 L514,419 L512,419 L512,421 L510,424 L510,426 L508,429 L508,431 L506,434 L496,461 L493,466 L493,468 L491,471 L491,473 L489,476 L489,478 L487,481 L477,508 L474,513 L474,515 L472,518 L472,520 L470,523 L470,525 L468,528 L458,555 L455,560 L445,587 L439,594 L400,623 L384,636 L381,634 L391,603 L393,600 L396,589 L402,575 L404,567 L409,556 L415,537 L417,534 L418,529 L420,526 L421,521 L423,518 L424,513 L426,510 L427,505 L429,502 L431,494 L433,491 L443,462 L447,454 L454,433 L458,425 L465,404 L471,391 L472,386 L476,378 L477,373 L481,365 L482,360 L488,347 L489,342 L491,339 L491,337 L493,334 L503,307 L509,294 L511,292 L514,293 L516,300 L525,319 L527,326 L530,331 L532,338 L535,343 L535,345 L540,355 L544,367 L547,372 L549,379 L552,384 L554,391 L557,396 L561,408 L564,413 L566,420 L569,425 L571,432 L574,437 L576,444 L579,449 L579,451 L590,475 L676,475 L677,474 L668,453 L668,451 L665,446 L661,434 L658,429 L652,412 L649,407 L645,395 L642,390 L636,373 L633,368 L629,356 L626,351 L620,334 L617,329 L611,312 L608,307 L604,295 L601,290 L595,273 L592,268 L586,251 L583,246 L579,234 L576,229 L570,212 L567,207 L561,190 L551,168 L549,161Z"/></svg>Agentes IA</div><p>En nuestra cita recorremos cada flujo juntos</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <aside id="controls">
+    <h1>Recorrido del ERP · 40 s<small>Lienzo vertical 9:16 (1080 × 1920). Todo el contenido es código: una sola línea de tiempo.</small></h1>
+    <div class="row"><button class="btn pri" id="play">▶ Reproducir</button><button class="btn" id="restart">⟲ Reiniciar</button></div>
+    <div><input type="range" id="seek" min="0" max="40" step="0.01" value="0"><div id="time">0.0 / 40.0 s</div></div>
+    <div class="row"><button class="btn" id="full">⛶ Pantalla completa</button></div>
+    <label class="chk"><input type="checkbox" id="guion"> Mostrar guion</label>
+    <div id="script"></div>
+    <label class="chk"><input type="checkbox" id="voz"> Voz del navegador (prueba)</label>
+    <div class="note">La voz está apagada por defecto y es solo una prueba de sincronía (voz sintética del navegador, no es la locución final). No hay música.<br>Atajos: espacio = pausa, ← → = ±1 s.</div>
+  </aside>
+</div>
+<script>
+/* =========================================================
+   DATA · todo lo editable del recorrido vive aquí
+   (tiempos, toques, cámara, guion, productos, pedidos)
+   ========================================================= */
+const DURATION = 12;
+const VPW = 1080, VPH = 1700;           // viewport del mundo dentro del lienzo 1080x1920
+
+/* ---- Geometría de dispositivos en el mundo ---- */
+const PHONE  = { x: 143, y: 2150, s: 1.9, bezel: 14, w: 390, h: 800 };
+const TABLET = { s: 0.8, bezel: 12, w: 1180, h: 760, x: 58.5, cy: 313 };
+const CAJA   = { top: 1149 };
+const COCINA = { top: 190 };
+const ph = (x, y) => [PHONE.x + PHONE.bezel * PHONE.s + x * PHONE.s, PHONE.y + PHONE.bezel * PHONE.s + y * PHONE.s];
+const tb = (zone) => (x, y) => [TABLET.x + TABLET.bezel * TABLET.s + x * TABLET.s, zone.top + TABLET.bezel * TABLET.s + y * TABLET.s];
+const cajaPt = tb(CAJA), cocinaPt = tb(COCINA);
+
+/* ---- Toques del teléfono (cada uno cambia algo comprobable +0.12 s después) ---- */
+const TP = {
+  pos: 1.80,         // barra inferior -> POS
+  almuerzo: 3.80,    // abre opciones del plato
+  menestra: 4.90,    // elige sopa
+  seat1: 5.55,       // elige asiento 1
+  add: 6.25,         // agrega al carrito
+  costilla: 7.25,    // agrega Costilla (asiento 2)
+  fab: 8.05,         // abre carrito
+  mesa11: 8.95,      // elige mesa
+  create: 9.90,      // crea comanda #021
+  ventas: 10.70,     // barra inferior -> Ventas
+  crm: 24.70,        // barra inferior -> CRM Chat
+  mariela: 26.20,    // abre conversación
+  agentes: 31.60,    // barra inferior -> Agentes IA
+  inv: 32.70,        // abre Agente de Inventario
+  cam: 34.85         // envía foto
+};
+const LAG = 0.12;
+const PHONE_TAPS = [
+  [TP.pos, 'nav-pos'], [TP.almuerzo, 'p-almuerzo'], [TP.menestra, 'opt-menestra'], [TP.seat1, 'seat-1'],
+  [TP.add, 'btn-add'], [TP.costilla, 'p-costilla'], [TP.fab, 'fab-cart'], [TP.mesa11, 'mesa-11-chip'],
+  [TP.create, 'btn-create'], [TP.ventas, 'nav-ventas'], [TP.crm, 'nav-crm'], [TP.mariela, 'crm-mariela'],
+  [TP.agentes, 'nav-agentes'], [TP.inv, 'ag-inv'], [TP.cam, 'btn-cam']
+].map(([t, sel]) => ({ t, sel }));
+const CAJA_TAPS   = [{ t: 15.50, sel: 'mesa-card-11' }];
+const COCINA_TAPS = [{ t: 22.40, sel: 'kds-btn-19' }];
+const T_MESA11_TAKEN = TP.create + LAG;      // Mesa 11 pasa de libre a ocupada
+const T_KDS_NEW = 18.90;                     // ticket #021 llega al KDS
+const T_KDS_19_OUT = COCINA_TAPS[0].t + LAG; // #019 sale del KDS
+const T_CAJA_SELECT = CAJA_TAPS[0].t + LAG;
+
+/* ---- Cámara: [t, cx, cy, escala, viaje?]  viaje=true -> arco suave hacia el siguiente cuadro ---- */
+const FULL = [540, 2937];
+const CAM = [
+  [0.0,  FULL[0], FULL[1], 0.94],
+  [3.0,  FULL[0], FULL[1], 1.00],
+  [3.7,  ...ph(195, 330), 1.25],
+  [4.4,  ...ph(195, 470), 1.20],
+  [6.4,  ...ph(195, 470), 1.20],
+  [7.0,  ...ph(195, 360), 1.25],
+  [7.9,  ...ph(195, 360), 1.25],
+  [8.5,  ...ph(195, 430), 1.15],
+  [10.4, ...ph(195, 430), 1.15],
+  [10.9, ...ph(195, 330), 1.30],
+  [13.3, ...ph(195, 330), 1.30, true],
+  [14.7, 540, CAJA.top + TABLET.cy, 1.00],
+  [15.2, 540, CAJA.top + TABLET.cy, 1.00],
+  [15.8, ...cajaPt(800, 330), 1.80],
+  [16.5, ...cajaPt(800, 330), 1.80],
+  [17.0, ...cajaPt(470, 330), 1.80],
+  [17.5, ...cajaPt(470, 330), 1.80, true],
+  [18.5, 540, COCINA.top + TABLET.cy, 1.00],
+  [19.0, 540, COCINA.top + TABLET.cy, 1.00],
+  [19.6, ...cocinaPt(556, 400), 1.50],
+  [22.8, ...cocinaPt(556, 400), 1.50, true],
+  [24.4, ...ph(195, 330), 1.25],
+  [25.9, ...ph(195, 330), 1.25],
+  [26.5, ...ph(195, 402), 1.10],
+  [36.6, ...ph(195, 402), 1.10],
+  [38.5, 540, 2250, 0.55],
+  [40.0, 540, 2250, 0.55]
+];
+
+/* ---- Guion / subtítulos (máx. dos líneas) ---- */
+const SUBS = [
+  [0.3, 2.9,  'Así se mueve un pedido en nuestro restaurante.'],
+  [3.2, 7.0,  'En el mostrador, el equipo elige los platos y personaliza el pedido.'],
+  [7.1, 10.7, 'Con un toque queda creada la comanda.'],
+  [11.1, 14.0, 'La comanda aparece enseguida en Ventas.'],
+  [14.4, 17.8, 'En caja, una tablet muestra las mesas y el estado del servicio.'],
+  [18.6, 23.0, 'En cocina, otra tablet recibe la orden en el KDS.'],
+  [24.6, 28.2, 'En CRM Chat, el agente vendedor conversa por WhatsApp'],
+  [28.2, 31.6, 'y ayuda a guiar los pedidos.'],
+  [32.0, 35.2, 'Para reabastecer, el equipo envía una foto, una nota de voz o un mensaje'],
+  [35.2, 38.0, 'al agente de inventario, que deja los insumos listos para revisión.']
+];
+const CLOSING = { from: 38.4, title: 'Agentes IA', phrase: 'En nuestra cita recorremos cada flujo juntos' };
+
+/* ---- Catálogo del POS ---- */
+const PRODUCTS = [
+  { id: 'almuerzo', cat: 'Almuerzos',      name: 'Almuerzo Ejecutivo', price: 3.50, art: 'almuerzo' },
+  { id: 'chuleta',  cat: 'Platos Normales', name: 'Chuleta',            price: 6.00, art: 'chuleta' },
+  { id: 'costilla', cat: 'Platos Normales', name: 'Costilla',           price: 6.00, art: 'costilla' },
+  { id: 'filete',   cat: 'Platos Normales', name: 'Filete de Pollo',    price: 5.50, art: 'filete' },
+  { id: 'lomo',     cat: 'Platos Normales', name: 'Lomo de Res',        price: 7.00, art: 'lomo' },
+  { id: 'cola',     cat: 'Bebidas',        name: 'Gaseosa de Cola',    price: 1.00, art: 'cola' },
+  { id: 'avena',    cat: 'Bebidas',        name: 'Avena Jarra',        price: 2.00, art: 'avena' }
+];
+
+/* ---- Comanda que enlaza todos los dispositivos ---- */
+const ORDER = {
+  id: '021', mesa: 11, total: '9.50', fecha: '15/10/2026 13:05', mesero: 'Jose',
+  items: [
+    { seat: 1, name: 'Almuerzo Ejecutivo', opt: 'Sopa de Menestra', price: '3.50' },
+    { seat: 2, name: 'Costilla', opt: 'Con Papas, Con Arroz', price: '6.00' }
+  ],
+  note: 'sin ají'
+};
+
+/* ---- Ventas (teléfono) ---- */
+const VENTAS = [
+  { id: '021', st: 'prep',  who: 'Comer Aquí · Mesa 11', items: 'Almuerzo Ejecutivo +1 más', total: '9.50',  date: '15/10/2026 13:05', isNew: true },
+  { id: '019', st: 'prep',  who: 'Comer Aquí · Mesa 4',  items: 'Lomo de Res +2 más',        total: '18.50', date: '15/10/2026 12:58' },
+  { id: '018', st: 'ready', who: 'Comer Aquí · Mesa 2',  items: 'Gaseosa de Cola +1 más',    total: '4.50',  date: '15/10/2026 12:41' },
+  { id: '017', st: 'done',  who: 'Camila Torres',        items: 'Filete de Pollo +1 más',    total: '12.00', date: '15/10/2026 12:20', billed: true }
+];
+
+/* ---- Mesas (tablet de caja) ---- */
+const MESAS = [
+  ['servida', '017', '24.00'], ['servida', '018', '4.50'], ['servida', '016', '13.00'], ['ocupada', '019', '18.50'],
+  ['servida', '012', '8.00'], ['servida', '013', '8.00'], ['servida', '014', '8.00'], ['servida', '015', '5.00'],
+  ['servida', '010', '14.50'], ['servida', '011', '3.50'], ['libre'], ['libre'],
+  ['libre'], ['libre'], ['libre'], ['libre'], ['libre'], ['libre'], ['libre']
+];
+const MESA_EARLY = { id: '018', mesa: 2, fecha: '15/10/2026 12:41', items: [
+  { seat: 1, name: 'Gaseosa de Cola', opt: 'Estándar', price: '1.00' },
+  { seat: 2, name: 'Almuerzo Ejecutivo', opt: 'Sopa de Menestra', price: '3.50' } ], total: '4.50' };
+
+/* ---- KDS (tablet de cocina) ---- */
+const KDS_TICKETS = [
+  { id: '019', mesa: 4, min: 6, seats: [
+      { seat: 1, items: [{ n: 'Lomo de Res', o: 'Con Arroz' }] },
+      { seat: 2, items: [{ n: 'Filete de Pollo', o: 'Con Papas', note: 'bien cocinado' }] },
+      { seat: 3, items: [{ n: 'Costilla', o: 'Con Papas' }] } ] },
+  { id: '021', mesa: 11, min: 0, isNew: true, seats: [
+      { seat: 1, items: [{ n: 'Almuerzo Ejecutivo', o: 'Sopa de Menestra' }] },
+      { seat: 2, items: [{ n: 'Costilla', o: 'Con Papas, Con Arroz', note: 'sin ají' }] } ] }
+];
+
+/* ---- CRM Chat ---- */
+const CRM_LIST = [
+  { ini: 'MP', name: 'Mariela Paredes', prev: 'Hola, ¿tienen almuerzos hoy?', date: '13:02', n: 1, dot: 'g', id: 'crm-mariela' },
+  { ini: 'DS', name: 'Diego Salazar', prev: '¡Perfecto! Te espero a las 14h', date: '12:40', n: 0, dot: 'g' },
+  { ini: 'AV', name: 'Andrea Vélez', prev: 'Gracias, ya recibí mi pedido', date: '12:15', n: 0, dot: 'g' },
+  { ini: 'GO', name: 'Grupo Oficina Norte', prev: 'Claro, estamos en la Av. Principal…', date: 'ayer', n: 0, dot: 'o' },
+  { ini: 'RM', name: 'Ricardo M.', prev: '¡No te preocupes! Dime, ¿en qué…', date: '12 de oct', n: 0, dot: 'o' },
+  { ini: 'LA', name: 'Lucía Andrade', prev: 'Sin mensajes', date: '10 de oct', n: 0, dot: 'o' },
+  { ini: 'CB', name: 'Carlos Benítez', prev: '¡Hola! Soy el asistente del restau…', date: '8 de oct', n: 0, dot: 'g' }
+];
+const CHAT = [
+  { who: 'c', at: 26.60, text: 'Hola, ¿tienen almuerzos hoy? ¿Cuánto cuesta?' },
+  { who: 'a', at: 27.95, text: '¡Hola, Mariela! Hoy tenemos el Almuerzo Ejecutivo a $3.50 (sopa, segundo y jugo). También Costilla y Chuleta a $6.00. ¿Cuál te provoca?' },
+  { who: 'c', at: 29.20, text: 'Dos almuerzos ejecutivos para retirar a las 13:30' },
+  { who: 'a', at: 30.45, text: 'Anotado: 2 Almuerzos Ejecutivos para retirar a las 13:30, total $7.00. Una persona del equipo lo revisa y te confirma por aquí.' }
+];
+const CHAT_TYPING = [[27.20, 27.95], [29.65, 30.45]];
+
+/* ---- Agentes IA ---- */
+const AGENTS = [
+  { name: 'Agente de Inventario', prev: '📸 Borrador de insumos listo para revisión', date: '6 d', id: 'ag-inv' },
+  { name: 'Agente Vendedor', prev: '¡Claro que sí! 📝 Te cuento las opciones del menú…', date: '12-oct' },
+  { name: 'Agente Administrador', prev: '✅ ¡Comprobante registrado correctamente!', date: '12-oct' },
+  { name: 'Agente Contador', prev: '✅ ¡Listo! El archivo cierre-octubre.md ya…', date: '08-oct' },
+  { name: 'Agente Analista de Datos', prev: '📄 Análisis de archivo CSV: he examinado…', date: '07-oct' },
+  { name: 'Agente de Eventos Especiales', prev: '¡Gracias por adjuntar el archivo! Entien…', date: '05-oct' }
+];
+const THREAD = {
+  intro: 'Hola, soy tu Agente de Inventario. Envíame una foto de tu compra, una nota de voz o un mensaje y dejo los insumos listos para tu revisión.',
+  signals: [[33.35, 'Foto'], [33.80, 'Voz'], [34.25, 'Texto']],   // [aparece, etiqueta]
+  signalsOut: 34.95,
+  photoAt: TP.cam + 0.15,
+  typing: [35.75, 36.75],
+  replyAt: 36.75,
+  reply: 'Listo. Organicé los insumos de tu compra y los dejé preparados para tu revisión:',
+  rows: [['Tomate', '6 kg'], ['Cebolla perla', '4 kg'], ['Pollo', '12 kg'], ['Papas', '25 kg'], ['Arroz', '10 kg'], ['Aceite', '6 L']],
+  foot: 'Aún no se modificó el stock.'
+};
+
+/* =========================================================
+   UTIL · matemáticas de tiempo y mini set de íconos
+   ========================================================= */
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const seg = (t, a, b) => (b === a ? (t >= b ? 1 : 0) : clamp((t - a) / (b - a)));
+const ease = u => (u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2);
+const easeOut = u => 1 - Math.pow(1 - u, 3);
+const easeBack = u => { const c = 1.9; return 1 + (c + 1) * Math.pow(u - 1, 3) + c * Math.pow(u - 1, 2); };
+const lerp = (a, b, u) => a + (b - a) * u;
+const $ = (root, k) => root.querySelector('[data-k="' + k + '"]');
+
+const ICONS = {
+  cart: '<circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M2 3h3l2.6 12.4a1.6 1.6 0 0 0 1.6 1.2h8.2a1.6 1.6 0 0 0 1.6-1.2L21 8H6"/>',
+  doc: '<path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"/><path d="M14 2v5h5M9 13h6M9 17h6"/>',
+  chat: '<path d="M4 4h16v12H9l-5 4z"/>',
+  box: '<path d="M12 2.5 21 7v10l-9 4.5L3 17V7z"/><path d="M3 7l9 4.5L21 7M12 11.5v10"/>',
+  agent: '<path d="M12 3 4.5 21M12 3l7.5 18M8.2 15.5h7.6"/><path d="M15.5 6.5l3-2.2"/>',
+  search: '<circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/>',
+  filter: '<path d="M3 4.5h18l-7 8.2V19l-4 2v-8.3z"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  mic: '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
+  camera: '<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.4"/>',
+  send: '<path d="M3 11 21 3l-8 18-2-7z"/>',
+  bot: '<rect x="4" y="8" width="16" height="11" rx="3.5"/><path d="M12 8V4.5M9 13v1.4M15 13v1.4"/><circle cx="12" cy="4" r="1"/>',
+  back: '<path d="M15 5l-7 7 7 7"/>',
+  grid: '<rect x="4" y="4" width="6.5" height="6.5" rx="1.2"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.2"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.2"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.2"/>',
+  chef: '<path d="M7 14.5a4 4 0 1 1 1.2-7.8A4.6 4.6 0 0 1 16 6.2a4 4 0 0 1 1 8.3V19H7z"/><path d="M7 17h10"/>',
+  clip: '<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9zM9 12h6M9 16h6"/>',
+  clock: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+  check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  user: '<circle cx="12" cy="8" r="3.8"/><path d="M4.5 21a7.5 7.5 0 0 1 15 0"/>',
+  fork: '<path d="M7 3v7M5 3v5a2 2 0 0 0 4 0V3M7 10v11M17 3c-2.2 2-3 4.6-3 8h3v10"/>',
+  bellOff: '<path d="M6 17h12l-1.6-2.6V10a4.4 4.4 0 0 0-8.8 0v4.4zM10 20a2 2 0 0 0 4 0M3 3l18 18"/>',
+  bell: '<path d="M6 17h12l-1.6-2.6V10a4.4 4.4 0 0 0-8.8 0v4.4zM10 20a2 2 0 0 0 4 0"/>',
+  expand: '<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>',
+  scan: '<path d="M4 8V4h4M16 4h4v4M4 16v4h4M20 16v4h-4M4 12h16"/>',
+  sliders: '<path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/>',
+  inbox: '<path d="M4 13l2.5-7h11L20 13v6H4z"/><path d="M4 13h4.5l1 2.2h5l1-2.2H20"/>',
+  gear: '<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/>',
+  pin: '<path d="M12 21s6-5.6 6-10.5a6 6 0 0 0-12 0C6 15.4 12 21 12 21z"/><circle cx="12" cy="10.5" r="2"/>',
+  collapse: '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M14 8l-4 4 4 4"/>',
+  down: '<path d="M7 10l5 5 5-5"/>'
+};
+function ic(name, size = 20, stroke = 1.9, color) {
+  return '<svg class="ic" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="' + (color || 'currentColor') +
+    '" stroke-width="' + stroke + '" stroke-linecap="round" stroke-linejoin="round">' + ICONS[name] + '</svg>';
+}
+/* Posición de un elemento dentro de una pantalla (coordenadas nativas), tomando en cuenta
+   desplazamientos (_ty/_tx) que el motor aplica por código. */
+function posIn(el, root) {
+  let x = 0, y = 0, e = el;
+  while (e && e !== root) {
+    x += e.offsetLeft + (e._tx || 0); y += e.offsetTop + (e._ty || 0);
+    e = e.offsetParent;
+  }
+  return [x + el.offsetWidth / 2, y + el.offsetHeight / 2];
+}
+const money = v => '$' + v;
+
+/* =========================================================
+   ART · ilustraciones originales de comida (SVG, viewBox 200x120)
+   ========================================================= */
+const ART = (() => {
+  const wrap = (bg, inner) => '<svg viewBox="0 0 200 120" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">' +
+    '<rect width="200" height="120" fill="' + bg + '"/>' +
+    '<rect y="92" width="200" height="28" fill="#000" opacity=".05"/>' + inner + '</svg>';
+  const plate = (cx = 100, cy = 64, rx = 84, ry = 46) =>
+    '<ellipse cx="' + cx + '" cy="' + (cy + 8) + '" rx="' + (rx - 4) + '" ry="' + (ry - 4) + '" fill="#000" opacity=".12"/>' +
+    '<ellipse cx="' + cx + '" cy="' + cy + '" rx="' + rx + '" ry="' + ry + '" fill="#fff"/>' +
+    '<ellipse cx="' + cx + '" cy="' + cy + '" rx="' + (rx - 10) + '" ry="' + (ry - 8) + '" fill="#F3F5F7" stroke="#E2E6EA" stroke-width="1.2"/>';
+  const potatoes = (x, y) => {
+    const s = [[0, 0, 16, 12, -12], [14, 8, 15, 11, 10], [-6, 13, 14, 11, 4], [22, -4, 12, 10, 20]];
+    return s.map(p => '<g transform="translate(' + (x + p[0]) + ' ' + (y + p[1]) + ') rotate(' + p[4] + ')">' +
+      '<rect x="-' + p[2] / 2 + '" y="-' + p[3] / 2 + '" width="' + p[2] + '" height="' + p[3] + '" rx="4" fill="#F2C14E"/>' +
+      '<rect x="-' + p[2] / 2 + '" y="' + (p[3] / 2 - 4) + '" width="' + p[2] + '" height="4" rx="2" fill="#D9A02E"/>' +
+      '<circle cx="-2" cy="-2" r="1.3" fill="#FFE59A"/></g>').join('');
+  };
+  const rice = (x, y, r = 17) => '<ellipse cx="' + x + '" cy="' + (y + 4) + '" rx="' + r + '" ry="' + (r * .6) + '" fill="#E4E7EA"/>' +
+    '<ellipse cx="' + x + '" cy="' + y + '" rx="' + r + '" ry="' + (r * .62) + '" fill="#FFFFFF" stroke="#E4E7EA"/>' +
+    [[-6, -2], [2, -4], [7, 0], [-2, 3], [4, 4], [-9, 2], [0, 0]].map(g => '<rect x="' + (x + g[0]) + '" y="' + (y + g[1]) + '" width="4" height="1.6" rx=".8" fill="#E2E5E9" transform="rotate(' + (g[0] * 7) + ' ' + (x + g[0]) + ' ' + (y + g[1]) + ')"/>').join('');
+  const leaf = (x, y, r, c) => '<ellipse cx="' + x + '" cy="' + y + '" rx="' + r + '" ry="' + (r * .55) + '" fill="' + c + '" transform="rotate(' + (x * 13 % 70 - 20) + ' ' + x + ' ' + y + ')"/>';
+
+  const chuleta = () => wrap('#FFF0E4', plate() +
+    '<path d="M52 56c4-14 28-20 50-14 16 4 24 16 18 28-6 12-26 16-46 12-20-4-26-14-22-26z" fill="#A3623A"/>' +
+    '<path d="M58 58c4-10 24-15 42-10 12 3 18 11 14 20" fill="none" stroke="#C98353" stroke-width="3" stroke-linecap="round"/>' +
+    '<path d="M64 52l12 22M78 48l12 24M92 48l12 22" stroke="#5E3419" stroke-width="3.2" stroke-linecap="round" opacity=".75"/>' +
+    '<circle cx="108" cy="64" r="6" fill="#F3E6D3"/><circle cx="108" cy="64" r="2.4" fill="#D8C3A5"/>' +
+    potatoes(68, 82) + '<path d="M128 56c8-10 26-8 28 4 2 10-6 18-18 16-10-1-16-10-10-20z" fill="#8CC152"/>' +
+    '<circle cx="142" cy="58" r="3" fill="#B6DF7C"/><circle cx="134" cy="66" r="2.4" fill="#B6DF7C"/><circle cx="146" cy="68" r="2" fill="#6FA83A"/>');
+
+  const costilla = () => wrap('#E7FAFF', plate() +
+    '<path d="M46 58c10-12 52-16 74-6 8 4 10 14 4 22-12 12-58 14-76 2-6-4-6-12-2-18z" fill="#8B3A1F"/>' +
+    '<path d="M52 56c14-8 46-10 66-2" fill="none" stroke="#C0603A" stroke-width="3.4" stroke-linecap="round"/>' +
+    [58, 72, 86, 100, 114].map(x => '<path d="M' + x + ' 52v24" stroke="#4A1D0E" stroke-width="2.4" opacity=".55" stroke-linecap="round"/>').join('') +
+    [60, 74, 88, 102].map(x => '<rect x="' + (x - 3) + '" y="74" width="6" height="9" rx="3" fill="#F6E9D2"/>').join('') +
+    rice(138, 56, 18) + potatoes(142, 82) + leaf(120, 38, 7, '#3FA34D') + leaf(128, 36, 6, '#58BE63'));
+
+  const filete = () => wrap('#FFF0E4', plate() +
+    '<path d="M44 62c4-16 34-22 56-14 12 4 18 14 12 24-8 12-40 16-58 6-8-4-12-10-10-16z" fill="#E8B35A"/>' +
+    '<path d="M52 58c8-8 30-12 46-6" fill="none" stroke="#F6D58E" stroke-width="3" stroke-linecap="round"/>' +
+    [[60, 66], [72, 58], [86, 70], [96, 56], [70, 74], [104, 66], [58, 60]].map(p => '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="2" fill="#C78F32"/>').join('') +
+    '<path d="M104 80l16-12 6 14z" fill="#FFE45E"/><path d="M107 79l12-9 3 9z" fill="#FFF3A6"/>' +
+    rice(134, 60, 17) + leaf(130, 84, 8, '#58BE63') + leaf(142, 82, 7, '#3FA34D') + leaf(120, 86, 6, '#7ACB6B') +
+    '<circle cx="150" cy="86" r="6" fill="#E5483A"/><circle cx="150" cy="86" r="3" fill="#FF7E6E"/>');
+
+  const lomo = () => wrap('#E7FAFF', plate() +
+    [[50, 46, -14], [62, 56, -8], [74, 66, -2], [88, 72, 4]].map((s, i) => '<g transform="rotate(' + s[2] + ' ' + s[0] + ' ' + s[1] + ')"><rect x="' + s[0] + '" y="' + s[1] + '" width="52" height="14" rx="7" fill="#6B3720"/>' +
+      '<rect x="' + (s[0] + 3) + '" y="' + (s[1] + 3) + '" width="46" height="8" rx="4" fill="#C75B52"/><rect x="' + (s[0] + 8) + '" y="' + (s[1] + 4) + '" width="30" height="3" rx="1.5" fill="#E58C84"/></g>').join('') +
+    '<circle cx="132" cy="40" r="8" fill="none" stroke="#C77FD0" stroke-width="3"/><circle cx="148" cy="48" r="7" fill="none" stroke="#B565C0" stroke-width="3"/><circle cx="124" cy="52" r="6" fill="none" stroke="#C77FD0" stroke-width="3"/>' +
+    rice(142, 76, 16) + leaf(112, 84, 6, '#3FA34D') + '<circle cx="118" cy="86" r="2.4" fill="#6FA83A"/>');
+
+  const almuerzo = () => wrap('#FFF0E4',
+    '<rect x="8" y="14" width="184" height="88" rx="14" fill="#B98954"/><rect x="12" y="18" width="176" height="80" rx="11" fill="#D2A06A"/>' +
+    // sopa
+    '<ellipse cx="54" cy="64" rx="38" ry="30" fill="#000" opacity=".12" transform="translate(0 5)"/><ellipse cx="54" cy="62" rx="38" ry="30" fill="#fff"/>' +
+    '<ellipse cx="54" cy="62" rx="30" ry="22" fill="#B9773D"/><ellipse cx="54" cy="60" rx="26" ry="18" fill="#CF8E4A"/>' +
+    [[42, 56], [54, 52], [64, 62], [48, 68], [60, 70], [38, 64]].map(p => '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="2.4" fill="#8C5526"/>').join('') +
+    leaf(50, 58, 4, '#3FA34D') + leaf(62, 56, 3.4, '#58BE63') +
+    // plato fuerte
+    '<ellipse cx="136" cy="62" rx="40" ry="32" fill="#000" opacity=".12" transform="translate(0 5)"/><ellipse cx="136" cy="62" rx="40" ry="32" fill="#fff"/>' +
+    '<ellipse cx="136" cy="62" rx="32" ry="24" fill="#F3F5F7" stroke="#E2E6EA"/>' +
+    '<path d="M114 56c6-10 26-12 32-2 4 8-4 16-16 16-12 0-20-6-16-14z" fill="#C7792E"/><path d="M120 54c6-4 16-5 22 0" stroke="#E9A453" stroke-width="3" fill="none" stroke-linecap="round"/>' +
+    rice(150, 74, 12) + leaf(120, 76, 5, '#58BE63') + leaf(128, 80, 4.4, '#3FA34D') +
+    // jugo
+    '<path d="M92 20h20l-3 26a3 3 0 0 1-3 3h-8a3 3 0 0 1-3-3z" fill="#fff" opacity=".9"/><path d="M94 28h16l-2 18h-12z" fill="#FF9F43"/><ellipse cx="102" cy="28" rx="8" ry="2.2" fill="#FFC27A"/>');
+
+  const cola = () => wrap('#E7FAFF',
+    '<ellipse cx="100" cy="104" rx="34" ry="6" fill="#000" opacity=".14"/>' +
+    '<path d="M66 18h68l-8 82a6 6 0 0 1-6 5H80a6 6 0 0 1-6-5z" fill="#fff" opacity=".85"/>' +
+    '<path d="M70 34h60l-6 64a4 4 0 0 1-4 4H80a4 4 0 0 1-4-4z" fill="#3B1F14"/><path d="M70 34h60l-1 10H71z" fill="#5A3322"/>' +
+    '<rect x="82" y="46" width="18" height="18" rx="3" fill="#fff" opacity=".6" transform="rotate(-12 91 55)"/><rect x="104" y="64" width="16" height="16" rx="3" fill="#fff" opacity=".55" transform="rotate(14 112 72)"/><rect x="86" y="76" width="14" height="14" rx="3" fill="#fff" opacity=".5" transform="rotate(-6 93 83)"/>' +
+    '<circle cx="120" cy="52" r="2" fill="#fff" opacity=".6"/><circle cx="76" cy="60" r="1.6" fill="#fff" opacity=".6"/>' +
+    '<path d="M112 6l8 80" stroke="#E5483A" stroke-width="5" stroke-linecap="round"/><path d="M68 20l60 0" stroke="#fff" stroke-width="3" opacity=".7"/>' +
+    '<path d="M138 86a14 14 0 0 1 14-14" stroke="#FFD166" stroke-width="3" fill="none" opacity="0"/>');
+
+  const avena = () => wrap('#FFF0E4',
+    '<ellipse cx="86" cy="104" rx="38" ry="6" fill="#000" opacity=".14"/>' +
+    '<path d="M56 24h58l6 10v58a8 8 0 0 1-8 8H58a8 8 0 0 1-8-8V34z" fill="#fff"/><path d="M58 40h54v50a6 6 0 0 1-6 6H64a6 6 0 0 1-6-6z" fill="#F2E2C4"/>' +
+    '<path d="M114 34c18 0 20 40 2 46" stroke="#fff" stroke-width="7" fill="none" stroke-linecap="round"/>' +
+    '<path d="M58 40h54l-1 8H59z" fill="#FFF6E0"/><path d="M66 56v32M80 52v38M96 56v34" stroke="#fff" stroke-width="2" opacity=".35"/>' +
+    '<path d="M150 56h28l-3 42a4 4 0 0 1-4 3h-14a4 4 0 0 1-4-3z" fill="#fff" opacity=".9"/><path d="M152 66h24l-2 32h-20z" fill="#F2E2C4"/>' +
+    '<ellipse cx="164" cy="104" rx="20" ry="3.5" fill="#000" opacity=".12"/><rect x="156" y="36" width="5" height="52" rx="2.5" fill="#B5683A" transform="rotate(14 158 62)"/>');
+
+  /* "foto" de la compra para el Agente de Inventario */
+  const compras = () => '<svg viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">' +
+    '<rect width="200" height="150" fill="#D9C7A8"/><rect y="104" width="200" height="46" fill="#B99A6E"/><path d="M0 104h200" stroke="#A58455" stroke-width="2"/>' +
+    '<path d="M40 52h90l10 82H30z" fill="#C79A5E"/><path d="M40 52h90l3 20H37z" fill="#B3844A"/>' +
+    '<circle cx="62" cy="48" r="13" fill="#E5483A"/><circle cx="58" cy="44" r="4" fill="#FF8A7A"/><path d="M60 36l5-5 4 6" stroke="#3FA34D" stroke-width="3" fill="none"/>' +
+    '<circle cx="86" cy="44" r="14" fill="#E5483A"/><circle cx="82" cy="40" r="4" fill="#FF8A7A"/>' +
+    '<ellipse cx="110" cy="46" rx="11" ry="12" fill="#C77FD0"/><path d="M110 34v-8" stroke="#E4C9E8" stroke-width="3"/>' +
+    '<path d="M122 30c10 10 8 28 2 34" stroke="#F58A1F" stroke-width="9" fill="none" stroke-linecap="round"/><path d="M126 26l6-8M130 30l8-4" stroke="#3FA34D" stroke-width="3" stroke-linecap="round"/>' +
+    '<rect x="146" y="62" width="44" height="62" rx="3" fill="#fff" transform="rotate(5 168 92)"/>' +
+    [72, 80, 88, 96, 104, 112].map((y, i) => '<rect x="152" y="' + y + '" width="' + (i % 2 ? 20 : 28) + '" height="2.6" rx="1" fill="#8A94A0" transform="rotate(5 168 92)"/><rect x="178" y="' + y + '" width="8" height="2.6" rx="1" fill="#8A94A0" transform="rotate(5 168 92)"/>').join('') +
+    '<ellipse cx="60" cy="128" rx="22" ry="9" fill="#F3D2CA"/><path d="M42 126c10-12 34-12 40 0" fill="#F7B8A8"/></svg>';
+
+  return { chuleta, costilla, filete, lomo, almuerzo, cola, avena, compras };
+})();
+
+/* =========================================================
+   PHONE · teléfono con el ERP móvil
+   (barra inferior, POS, carrito, Ventas, CRM Chat, Agentes IA)
+   + Cursor táctil compartido con las tablets
+   ========================================================= */
+
+/* ---- Cursor/dedo: siempre se mueve HACIA el control que cambia ---- */
+function makeCursor(root, taps) {
+  const el = document.createElement('div');
+  el.className = 'touch';
+  el.innerHTML = '<i class="ring"></i><i class="dot"></i>';
+  root.appendChild(el);
+  const rip = document.createElement('div');
+  rip.className = 'ripple';
+  root.appendChild(rip);
+  const get = sel => root.querySelector('[data-k="' + sel + '"]');
+  const near = (a, b) => b && a.t - b.t < 1.5;
+  return {
+    update(t) {
+      const n = taps.findIndex(tp => t < tp.t);
+      let pos = null, alpha = 0, press = 0;
+      if (n >= 0) {
+        const tp = taps[n], prev = taps[n - 1], tg = get(tp.sel);
+        if (tg) {
+          const P = posIn(tg, root);
+          if (near(tp, prev) && t >= prev.t) {
+            const pg = get(prev.sel);
+            const pp = pg ? posIn(pg, root) : P;
+            const u = ease(seg(t, prev.t + 0.05, tp.t - 0.04));
+            pos = [lerp(pp[0], P[0], u), lerp(pp[1], P[1], u)]; alpha = 1;
+          } else if (t >= tp.t - 0.75) {
+            const t0 = tp.t - 0.75, u = easeOut(seg(t, t0, tp.t - 0.04));
+            const s = (n % 2 ? -1 : 1);
+            pos = [P[0] + (1 - u) * s * 60, P[1] + (1 - u) * 95]; alpha = seg(t, t0, t0 + 0.22);
+          }
+        }
+      }
+      const p = taps.findIndex(tp => t >= tp.t - 0.04 && t < tp.t + 0.4);
+      let ripple = null;
+      if (p >= 0) {
+        const tp = taps[p], tg = get(tp.sel), nx = taps[p + 1];
+        if (tg) {
+          const P = posIn(tg, root);
+          if (!pos) pos = P;
+          if (!(nx && near(nx, tp))) alpha = Math.min(1, 1 - seg(t, tp.t + 0.12, tp.t + 0.4));
+          else alpha = 1;
+          press = 1 - seg(Math.abs(t - (tp.t + 0.03)), 0, 0.12);
+          const ru = seg(t, tp.t, tp.t + 0.4);
+          if (ru > 0 && ru < 1) ripple = [P, ru];
+        }
+      }
+      const hw = el.offsetWidth / 2 || 22, rw = rip.offsetWidth / 2 || 30;
+      if (!pos) { el.style.opacity = 0; } else {
+        el.style.opacity = alpha;
+        el.style.transform = 'translate(' + (pos[0] - hw) + 'px,' + (pos[1] - hw) + 'px) scale(' + (1 - 0.18 * press) + ')';
+      }
+      if (ripple) {
+        rip.style.opacity = 0.55 * (1 - ripple[1]);
+        rip.style.transform = 'translate(' + (ripple[0][0] - rw) + 'px,' + (ripple[0][1] - rw) + 'px) scale(' + (0.3 + ripple[1] * 1.0) + ')';
+      } else rip.style.opacity = 0;
+    }
+  };
+}
+
+/* ---- Estado de pantalla del teléfono a partir del tiempo ---- */
+function phoneScreen(t) {
+  if (t < TP.pos + LAG) return 'crm';
+  if (t < TP.ventas + LAG) return 'pos';
+  if (t < TP.crm + LAG) return 'ventas';
+  if (t < TP.mariela + LAG) return 'crm';
+  if (t < TP.agentes + LAG) return 'chat';
+  if (t < TP.inv + LAG) return 'agentes';
+  return 'thread';
+}
+
+function buildPhone() {
+  const root = document.createElement('div');
+  root.className = 'phone';
+  const catGroups = [...new Set(PRODUCTS.map(p => p.cat))];
+  const pos = '<div class="searchrow"><div class="search">' + ic('search', 18) + '<span>Buscar por nombre, SKU o código…</span><span class="grow"></span>' + ic('scan', 18) + '</div><div class="sqbtn">' + ic('sliders', 19) + '</div></div>' +
+    catGroups.map(c => '<div class="sec-title">' + c.toUpperCase() + '</div><div class="grid">' +
+      PRODUCTS.filter(p => p.cat === c).map(p =>
+        '<div class="card" data-k="p-' + p.id + '"><div class="img">' + ART[p.art]() + '<span class="chip">' + p.cat + '</span></div><div class="pname">' + p.name + '</div><div class="pprice">$' + p.price.toFixed(2) + '</div></div>').join('') + '</div>').join('');
+
+  const stLabel = { prep: ic('clock', 12, 2.2) + ' En preparación', ready: ic('check', 12, 2.4) + ' Listo para Servir', done: ic('box', 12, 2.2) + ' Completado' };
+  const ventas = '<div class="vtabs"><span class="on">' + ic('clip', 17) + ' Comandas</span><span>' + ic('grid', 17) + ' Mesas</span><span>' + ic('chef', 17) + ' KDS</span></div>' +
+    '<div class="searchrow"><div class="search">' + ic('search', 18) + '<span>Buscar por ticket o cliente…</span></div><div class="sqbtn">' + ic('filter', 18) + '</div><div class="sqbtn">' + ic('user', 18) + '</div></div>' +
+    '<div class="h-hist">Historial de Comandas</div>' +
+    VENTAS.map((v, i) => {
+      const parts = v.who.split(' · '), name = parts.length > 1 ? parts[1] : v.who, sub = parts.length > 1 ? parts[0] : 'Para llevar';
+      return '<div class="vcard' + (v.isNew ? ' new' : '') + '" data-k="v-' + v.id + '"><div class="vl"><div class="vtop"><span class="vid">#' + v.id + '</span><span class="vst ' + v.st + '">' + stLabel[v.st] + '</span><span class="vwho">' + ic('user', 12, 2.2) + ' ' + ORDER.mesero + '</span></div>' +
+        '<div class="vname">' + name + '</div><div class="vsub">' + sub + '</div><div class="vitems">' + v.items + '</div></div>' +
+        '<div class="vr"><div class="vtotal">$' + v.total + '</div><div class="vdate">' + v.date + ' ›</div>' + (v.billed ? '<span class="fact">' + ic('check', 11, 2.6) + ' Facturado</span>' : '') + '</div></div>';
+    }).join('');
+
+  const crm = '<div class="searchrow"><div class="search">' + ic('search', 18) + '<span>Buscar chats…</span></div><div class="sqbtn">' + ic('filter', 18) + '</div><div class="sqbtn">' + ic('inbox', 18) + '</div></div>' +
+    CRM_LIST.map(c => '<div class="crow" ' + (c.id ? 'data-k="' + c.id + '"' : '') + '><div class="av">' + c.ini + '<i class="sdot ' + c.dot + '"></i></div><div class="cm"><div class="cn">' + c.name + '</div><div class="cp">' + c.prev + '</div></div><div class="cr"><div class="cd">' + c.date + '</div>' + (c.n ? '<div class="cb">' + c.n + '</div>' : '<div class="c0">0</div>') + '</div></div>').join('') +
+    '<div class="fab sm">' + ic('plus', 26, 2.2) + '</div>';
+
+  const agentes = '<div class="ahead"><span class="alogo">' + ic('agent', 22, 2.2) + '</span><b>Centro de Agentes IA</b><span class="grow"></span><span class="avatar">R</span></div>' +
+    '<div class="searchrow"><div class="search">' + ic('search', 18) + '<span>Buscar hilos de agentes…</span></div><div class="sqbtn">' + ic('filter', 18) + '</div></div>' +
+    AGENTS.map(a => '<div class="crow arow" ' + (a.id ? 'data-k="' + a.id + '"' : '') + '><div class="av bot">' + ic('bot', 22, 1.7) + '<i class="sdot g"></i></div><div class="cm"><div class="cn">' + a.name + '</div><div class="cp">' + a.prev + '</div></div><div class="cr"><div class="cd">' + a.date + '</div></div></div>').join('') +
+    '<div class="fab sm">' + ic('plus', 26, 2.2) + '</div>';
+
+  const chat = '<div class="chead">' + ic('back', 22) + '<div class="av s">MP</div><div class="ct"><b>Mariela Paredes</b><small><i class="sdot g inl"></i>WhatsApp · Agente vendedor atendiendo</small></div></div>' +
+    '<div class="msgs" data-k="chat-msgs">' + CHAT.map((m, i) => '<div class="msg ' + (m.who === 'c' ? 'in' : 'out') + '" data-i="' + i + '">' + (m.who === 'a' ? '<em>Agente vendedor</em>' : '') + m.text + '</div>').join('') +
+    '<div class="typing" data-k="chat-typing"><i></i><i></i><i></i></div></div>' +
+    '<div class="composer"><div class="cin">El agente está atendiendo esta conversación</div><div class="csend off">' + ic('send', 18) + '</div></div>';
+
+  const thread = '<div class="chead">' + ic('back', 22) + '<div class="av s bot">' + ic('bot', 20, 1.7) + '</div><div class="ct"><b>Agente de Inventario</b><small><i class="sdot g inl"></i>En línea</small></div></div>' +
+    '<div class="msgs" data-k="th-msgs"><div class="msg in">' + '<em>Agente de Inventario</em>' + THREAD.intro + '</div>' +
+    '<div class="msg me photo" data-k="th-photo"><div class="pimg">' + ART.compras() + '</div><span>Compras del mercado</span></div>' +
+    '<div class="typing" data-k="th-typing"><i></i><i></i><i></i></div>' +
+    '<div class="msg in reply" data-k="th-reply"><em>Agente de Inventario</em>' + THREAD.reply +
+    '<div class="rows">' + THREAD.rows.map(r => '<span><b>' + r[0] + '</b>' + r[1] + '</span>').join('') + '</div><div class="foot">' + ic('clock', 12, 2) + ' En revisión · ' + THREAD.foot + '</div></div></div>' +
+    '<div class="sigs">' + THREAD.signals.map((s, i) => '<span class="sig" data-i="' + i + '">' + ic(['camera', 'mic', 'send'][i], 14, 2.2) + s[1] + '</span>').join('') + '</div>' +
+    '<div class="composer"><div class="cbtn" data-k="btn-cam">' + ic('camera', 21) + '</div><div class="cbtn" data-k="btn-mic">' + ic('mic', 21) + '</div><div class="cin">Escribe un mensaje…</div><div class="csend">' + ic('send', 18) + '</div></div>';
+
+  const optSheet = '<div class="sheet s-opt" data-k="sheet-opt"><div class="grab"></div><div class="sh-head"><div class="sh-img">' + ART.almuerzo() + '</div><div><div class="sh-title">Almuerzo Ejecutivo</div><div class="sh-price">$3.50</div></div></div>' +
+    '<div class="sh-label">Sopa</div><div class="chips"><span class="opt" data-k="opt-menestra">Menestra</span><span class="opt">Crema de zapallo</span></div>' +
+    '<div class="sh-label">Jugo</div><div class="chips"><span class="opt on">Naranjilla</span><span class="opt">Mora</span></div>' +
+    '<div class="sh-label">Asiento</div><div class="chips seats">' + [1, 2, 3, 4].map(n => '<span class="opt" data-k="seat-' + n + '">' + n + '</span>').join('') + '</div>' +
+    '<div class="btn-main" data-k="btn-add">Agregar · $3.50</div></div>';
+  const cartSheet = '<div class="sheet s-cart" data-k="sheet-cart"><div class="grab"></div><div class="sh-title big">Nueva comanda</div>' +
+    '<div class="seg2"><span class="on">Comer aquí</span><span>Para llevar</span></div>' +
+    '<div class="sh-label">Mesa</div><div class="chips"><span class="opt wide" data-k="mesa-11-chip">' + ic('pin', 14, 2.2) + ' <b data-k="mesa-txt">Elegir mesa</b></span></div>' +
+    ORDER.items.map(it => '<div class="cl"><div class="seatlbl">ASIENTO ' + it.seat + '</div><div class="crw"><div><b>' + it.name + '</b><small>' + it.opt + '</small></div><b>$' + it.price + '</b></div></div>').join('') +
+    '<div class="tot"><span>TOTAL</span><b>$' + ORDER.total + '</b></div><div class="btn-main" data-k="btn-create">Crear comanda</div></div>';
+
+  root.innerHTML = '<div class="island"></div><div class="ph-screen" data-k="screen">' +
+    '<div class="statusbar"><b>13:05</b><span class="grow"></span><i class="sig4"></i><i class="batt"></i></div>' +
+    '<div class="scr" data-k="s-pos">' + pos + '</div><div class="scr" data-k="s-ventas">' + ventas + '</div>' +
+    '<div class="scr" data-k="s-crm">' + crm + '</div><div class="scr" data-k="s-agentes">' + agentes + '</div>' +
+    '<div class="scr full" data-k="s-chat">' + chat + '</div><div class="scr full" data-k="s-thread">' + thread + '</div>' +
+    '<div class="fab" data-k="fab-cart">' + ic('cart', 30, 2) + '<span class="mic">' + ic('mic', 15, 2.2) + '</span><span class="badge" data-k="badge">0</span></div>' +
+    '<div class="nav"><div data-k="nav-pos">' + ic('cart', 23) + '<span>POS</span></div><div data-k="nav-ventas">' + ic('doc', 23) + '<span>Ventas</span></div><div data-k="nav-crm">' + ic('chat', 23) + '<span>CRM Chat</span></div><div data-k="nav-inv">' + ic('box', 23) + '<span>Inventario</span></div><div data-k="nav-agentes">' + ic('agent', 23) + '<span>Agentes IA</span></div></div>' +
+    '<div class="scrim" data-k="scrim"></div>' + optSheet + cartSheet +
+    '<div class="toast" data-k="toast"><span class="tk">' + ic('check', 18, 2.8) + '</span><div><b>Comanda #' + ORDER.id + ' creada</b><small>Mesa ' + ORDER.mesa + ' · enviada a cocina</small></div></div></div>';
+
+  const S = root.querySelector('[data-k="screen"]');
+  const screens = { pos: $(S, 's-pos'), ventas: $(S, 's-ventas'), crm: $(S, 's-crm'), agentes: $(S, 's-agentes'), chat: $(S, 's-chat'), thread: $(S, 's-thread') };
+  const tabOf = { pos: 'pos', ventas: 'ventas', crm: 'crm', chat: 'crm', agentes: 'agentes', thread: 'agentes' };
+  const nav = { pos: $(S, 'nav-pos'), ventas: $(S, 'nav-ventas'), crm: $(S, 'nav-crm'), agentes: $(S, 'nav-agentes') };
+  const fab = $(S, 'fab-cart'), badge = $(S, 'badge'), scrim = $(S, 'scrim'), sheetOpt = $(S, 'sheet-opt'), sheetCart = $(S, 'sheet-cart'), toast = $(S, 'toast');
+  const OPT_H = 392, CART_H = 470;
+  const cursor = makeCursor(S, PHONE_TAPS);
+  function pressScale(t, tapT) { const d = Math.abs(t - (tapT + 0.04)); return 1 - 0.04 * (1 - seg(d, 0, 0.14)); }
+  const msgsChat = [...S.querySelectorAll('[data-k="chat-msgs"] .msg')];
+  const typChat = $(S, 'chat-typing'), typTh = $(S, 'th-typing'), photo = $(S, 'th-photo'), reply = $(S, 'th-reply');
+  const sigs = [...S.querySelectorAll('.sig')];
+  const camBtn = $(S, 'btn-cam'), micBtn = $(S, 'btn-mic');
+
+  function setTyping(el, t, win) {
+    const on = t >= win[0] && t < win[1];
+    el.style.display = on ? 'flex' : 'none';
+    [...el.children].forEach((d, i) => { d.style.opacity = on ? (0.3 + 0.7 * (0.5 + 0.5 * Math.sin(t * 9 - i * 1.1))).toFixed(3) : ''; });
+  }
+  function appear(el, t, at) {
+    const u = easeOut(seg(t, at, at + 0.32));
+    el.style.display = t >= at ? '' : 'none';
+    el.style.opacity = u; el.style.transform = 'translateY(' + ((1 - u) * 14) + 'px)';
+  }
+
+  function update(t) {
+    const sc = phoneScreen(t);
+    for (const k in screens) screens[k].style.display = k === sc ? 'block' : 'none';
+    for (const k in nav) nav[k].classList.toggle('on', tabOf[sc] === k);
+    $(S, 'nav-inv').classList.remove('on');
+    S.querySelector('.nav').style.display = '';
+    fab.style.display = sc === 'pos' ? 'flex' : 'none';
+
+    /* --- POS --- */
+    const added1 = t >= TP.add + LAG, added2 = t >= TP.costilla + LAG, created = t >= TP.create + LAG;
+    const n = created ? 0 : (added1 ? 1 : 0) + (added2 ? 1 : 0);
+    badge.textContent = n; badge.style.display = n ? 'flex' : 'none';
+    const bump = Math.max(bumpAt(t, TP.add + LAG), bumpAt(t, TP.costilla + LAG));
+    fab.style.transform = 'scale(' + (1 + 0.14 * bump) + ')';
+    $(S, 'p-almuerzo').style.transform = 'scale(' + pressScale(t, TP.almuerzo) + ')';
+    $(S, 'p-costilla').style.transform = 'scale(' + pressScale(t, TP.costilla) + ')';
+    $(S, 'p-costilla').classList.toggle('flash', t >= TP.costilla + LAG && t < TP.costilla + LAG + 0.9);
+
+    const oO = easeOut(seg(t, TP.almuerzo + LAG, TP.almuerzo + LAG + 0.38)), oC = ease(seg(t, TP.add + LAG, TP.add + LAG + 0.3));
+    const optFrac = (1 - oO) + oC; sheetOpt._ty = optFrac * (sheetOpt.offsetHeight || OPT_H); sheetOpt.style.transform = 'translateY(' + sheetOpt._ty + 'px)';
+    const cO = easeOut(seg(t, TP.fab + LAG, TP.fab + LAG + 0.38)), cC = ease(seg(t, TP.create + LAG, TP.create + LAG + 0.3));
+    const cartFrac = (1 - cO) + cC; sheetCart._ty = cartFrac * (sheetCart.offsetHeight || CART_H); sheetCart.style.transform = 'translateY(' + sheetCart._ty + 'px)';
+    scrim.style.opacity = 0.5 * Math.max(Math.min(1, oO) * (1 - oC), Math.min(1, cO) * (1 - cC));
+    sheetOpt.style.visibility = optFrac < 0.995 ? 'visible' : 'hidden';
+    sheetCart.style.visibility = cartFrac < 0.995 ? 'visible' : 'hidden';
+    scrim.style.visibility = scrim.style.opacity > 0.01 ? 'visible' : 'hidden';
+
+    const menestra = t >= TP.menestra + LAG, seat1 = t >= TP.seat1 + LAG, mesa = t >= TP.mesa11 + LAG;
+    $(S, 'opt-menestra').classList.toggle('on', menestra);
+    $(S, 'seat-1').classList.toggle('on', seat1);
+    $(S, 'btn-add').classList.toggle('off', !(menestra && seat1));
+    $(S, 'mesa-11-chip').classList.toggle('on', mesa);
+    $(S, 'mesa-txt').textContent = mesa ? 'Mesa 11 · Comer aquí' : 'Elegir mesa';
+    $(S, 'btn-create').classList.toggle('off', !mesa);
+    $(S, 'btn-add').style.transform = 'scale(' + pressScale(t, TP.add) + ')';
+    $(S, 'btn-create').style.transform = 'scale(' + pressScale(t, TP.create) + ')';
+
+    const tu = seg(t, TP.create + LAG + 0.05, TP.create + LAG + 0.4) * (1 - seg(t, TP.create + LAG + 0.95, TP.create + LAG + 1.25));
+    toast.style.opacity = tu; toast.style.transform = 'translate(-50%,' + ((1 - easeOut(Math.min(1, tu * 1.4))) * -18) + 'px)';
+
+    /* --- Ventas: la nueva comanda entra con un destello --- */
+    const nv = $(S, 'v-021'), nu = easeOut(seg(t, TP.ventas + LAG, TP.ventas + LAG + 0.55));
+    nv.style.opacity = nu; nv.style.transform = 'translateY(' + ((1 - nu) * -26) + 'px)';
+    nv.style.setProperty('--glow', (0.5 + 0.5 * Math.sin((t - TP.ventas) * 5)) * (1 - seg(t, TP.ventas + 1.6, TP.ventas + 2.8)));
+
+    /* --- CRM: la fila de Mariela se resalta al tocarla --- */
+    $(S, 'crm-mariela').classList.toggle('hl', t >= TP.mariela - 0.04 && t < TP.mariela + LAG + 0.4);
+    $(S, 'ag-inv').classList.toggle('hl', t >= TP.inv - 0.04 && t < TP.inv + LAG + 0.4);
+
+    /* --- Chat con el agente vendedor --- */
+    msgsChat.forEach((m, i) => appear(m, t, CHAT[i].at));
+    setTyping(typChat, t, [CHAT_TYPING[0][0], CHAT_TYPING[0][1]]);
+    if (t >= CHAT_TYPING[1][0] && t < CHAT_TYPING[1][1]) setTyping(typChat, t, CHAT_TYPING[1]);
+    typChat.style.order = 99;
+
+    /* --- Hilo con el Agente de Inventario --- */
+    THREAD.signals.forEach((s, i) => {
+      const u = easeBack(seg(t, s[0], s[0] + 0.35)) * (1 - seg(t, THREAD.signalsOut, THREAD.signalsOut + 0.25));
+      sigs[i].style.opacity = Math.min(1, u); sigs[i].style.transform = 'scale(' + (0.6 + 0.4 * Math.max(0, u)) + ')'; sigs[i].style.display = u > 0.01 ? 'inline-flex' : 'none';
+    });
+    const hl = i => { const s = THREAD.signals[i][0]; return t >= s && t < s + 0.5; };
+    camBtn.classList.toggle('glow', hl(0) || (t >= TP.cam - 0.04 && t < TP.cam + 0.3));
+    micBtn.classList.toggle('glow', hl(1));
+    $(S, 's-thread').querySelector('.cin').classList.toggle('glow', hl(2));
+    appear(photo, t, THREAD.photoAt);
+    setTyping(typTh, t, THREAD.typing);
+    appear(reply, t, THREAD.replyAt);
+
+    cursor.update(t);
+  }
+  function bumpAt(t, at) { const u = seg(t, at, at + 0.4); return u > 0 && u < 1 ? Math.sin(u * Math.PI) : 0; }
+
+  return { root, update, screen: S };
+}
+
+/* =========================================================
+   TABLETS · Mesas (caja) y KDS (cocina) + ambiente mínimo
+   ========================================================= */
+function tabletShell(zone, activeTab, inner) {
+  const root = document.createElement('div');
+  root.className = 'tablet';
+  root.style.top = zone.top + 'px';
+  const nav = [['cart', 'POS / Mostrador'], ['doc', 'Ventas', 1], ['chat', 'CRM Chat'], ['box', 'Inventario'], ['agent', 'Agentes IA']];
+  root.innerHTML = '<div class="cam"></div><div class="tb-screen" data-k="screen">' +
+    '<aside class="side"><div class="brand"><span class="bl">' + ic('chef', 24, 2) + '</span><div><b>Restaurante Hub</b><small>Agentes IA</small></div></div>' +
+    '<div class="adm">♛ ADMIN</div>' +
+    nav.map(n => '<div class="ni' + (n[2] ? ' on' : '') + '">' + ic(n[0], 20) + '<span>' + n[1] + '</span></div>').join('') +
+    '<div class="grow"></div><div class="col">' + ic('collapse', 22) + '<span>Colapsar</span></div></aside>' +
+    '<main class="mainp"><div class="ttabs"><span' + (activeTab === 'com' ? ' class="on"' : '') + '>' + ic('clip', 17) + ' Comandas</span><span' + (activeTab === 'mesas' ? ' class="on"' : '') + '>' + ic('grid', 17) + ' Mesas</span><span' + (activeTab === 'kds' ? ' class="on"' : '') + '>' + ic('chef', 17) + ' Cocina (KDS)</span></div>' +
+    inner + '</main></div>';
+  return root;
+}
+
+/* ================= MESAS (caja) ================= */
+function buildMesas() {
+  const detail = (o, status) => '<div class="dhead">' + ic('back', 22) + '<div><b>Comanda #' + o.id + '</b><small>' + o.fecha + '</small></div><span class="grow"></span><span class="dst ' + status[0] + '">' + status[1] + ' ' + ic('down', 14, 2.4) + '</span></div>' +
+    '<div class="dcard"><small class="cap">CLIENTE</small><span class="tag">comer_aqui</span><b class="big">Consumidor Final</b><div class="mut">Atendido por <b>Jose</b></div><div class="pin">' + ic('pin', 12, 2.4) + ' Mesa: ' + o.mesa + '</div></div>' +
+    '<div class="dcard"><small class="cap">PRODUCTOS</small>' + o.items.map(it => '<div class="sl">ASIENTO ' + it.seat + '</div><div class="pi"><div class="pr1"><b>' + it.name + '</b><span class="x1">x1</span></div><div class="pr2"><span class="x1">x1</span><i>' + it.opt + '</i><b class="pc">$' + it.price + '</b></div></div>').join('') +
+    '<div class="addpos">' + ic('cart', 18) + ' + Agregar Producto al POS</div></div>' +
+    '<div class="dcard tot"><span>TOTAL DE ORDEN</span><b>$' + o.total + '</b></div>';
+  const o21 = { id: ORDER.id, mesa: ORDER.mesa, fecha: ORDER.fecha, items: ORDER.items, total: ORDER.total };
+  const mesaHTML = MESAS.map((m, i) => {
+    const n = i + 1;
+    return '<div class="mesa ' + m[0] + '" data-k="mesa-card-' + n + '"><b class="mn">Mesa ' + n + '</b><span class="ms">' + m[0].toUpperCase() + '</span><small class="mc">' + (m[1] ? 'Comanda #' + m[1] : '') + '</small><b class="mt">' + (m[2] ? '$' + m[2] : '') + '</b><i class="mp">+</i><em class="nueva">NUEVA</em></div>';
+  }).join('');
+  const inner = '<div class="mesas-split"><section class="dpanel"><div data-k="d-early">' + detail(MESA_EARLY, ['rdy', 'Listo para Servir']) + '</div><div data-k="d-new">' + detail(o21, ['prp', 'En preparación']) + '</div></section>' +
+    '<section class="gpanel"><div class="gtitle">' + ic('fork', 22, 2) + '<b>Distribución de Mesas (19)</b><span class="grow"></span><span class="gear">' + ic('gear', 18) + '</span></div>' +
+    '<div class="legend"><i class="g"></i>Libre <i class="r"></i>Ocupada <i class="a"></i>Servida</div><div class="mgrid">' + mesaHTML + '</div></section></div>';
+  const root = tabletShell(CAJA, 'mesas', inner);
+  const S = $(root, 'screen');
+  const cursor = makeCursor(S, CAJA_TAPS);
+  const early = $(S, 'd-early'), nw = $(S, 'd-new');
+  const m11 = $(S, 'mesa-card-11'), m2 = $(S, 'mesa-card-2');
+  function update(t) {
+    const taken = t >= T_MESA11_TAKEN, sel = t >= T_CAJA_SELECT;
+    m11.className = 'mesa ' + (taken ? 'ocupada' : 'libre') + (sel ? ' sel' : '') + (taken && !sel ? ' fresh' : '');
+    m11.querySelector('.ms').textContent = taken ? 'OCUPADA' : 'LIBRE';
+    m11.querySelector('.mc').textContent = taken ? 'Comanda #' + ORDER.id : '';
+    m11.querySelector('.mt').textContent = taken ? '$' + ORDER.total : '';
+    m11.querySelector('.nueva').style.display = taken && !sel ? 'inline-block' : 'none';
+    m11.style.setProperty('--pulse', (0.5 + 0.5 * Math.sin(t * 6)).toFixed(3));
+    m11.style.transform = 'scale(' + (1 - 0.03 * (1 - seg(Math.abs(t - (CAJA_TAPS[0].t + 0.04)), 0, 0.14))) + ')';
+    m2.classList.toggle('sel', !sel);
+    early.style.display = sel ? 'none' : 'block';
+    nw.style.display = sel ? 'block' : 'none';
+    cursor.update(t);
+  }
+  return { root, update };
+}
+
+/* ================= KDS (cocina) ================= */
+function buildKDS() {
+  const ticket = tk => '<div class="tkt' + (tk.isNew ? ' fresh' : '') + '" data-k="kds-' + tk.id + '"><div class="th"><div class="tl"><small>MESA: ' + tk.mesa + '</small><b>' + ic('fork', 20, 2.2) + ' COMER AQUÍ</b></div><div class="tc"><small>COMANDA</small><b>#' + tk.id + '</b></div></div>' +
+    '<div class="tm">' + ic('clock', 15, 2.2) + '<b>' + tk.min + ' min (Normal)</b><span class="who">' + ic('user', 12, 2.2) + ' Jose</span>' + (tk.isNew ? '<span class="newtag">NUEVA</span>' : '') + '</div><div class="tbody">' +
+    tk.seats.map(s => '<div class="seat"><div class="sl">ASIENTO ' + s.seat + '</div>' + s.items.map(it => '<div class="it"><span class="q">1</span><div><b>' + it.n + '</b><small>' + it.o + '</small>' + (it.note ? '<em>"' + it.note + '"</em>' : '') + '</div></div>').join('') + '</div>').join('') +
+    '</div><div class="tbtn" data-k="kds-btn-' + tk.id + '">' + ic('chef', 17, 2.2) + ' Listo para Servir ✓</div></div>';
+  const inner = '<div class="khead">' + ic('chef', 24, 2) + '<b>Pantalla de Cocina (KDS)</b><span class="grow"></span><span class="lg"><i class="g"></i>Normal (&lt;10m)</span><span class="lg"><i class="a"></i>Alerta (10-20m)</span><span class="lg"><i class="r"></i>RUSH (&gt;20m)</span>' +
+    '<span class="pend" data-k="pend">1 Pendientes</span><span class="fs"><i class="on">A</i><i>A</i><i>A+</i></span><span class="ib">' + ic('clock', 19) + '</span><span class="ib" data-k="bell">' + ic('bellOff', 19) + '</span><span class="ib">' + ic('expand', 19) + '</span></div>' +
+    '<div class="alert" data-k="alert">' + ic('bell', 18, 2.2) + ' Nueva comanda #' + ORDER.id + ' · Mesa ' + ORDER.mesa + '</div>' +
+    '<div class="tickets">' + KDS_TICKETS.map(ticket).join('') + '</div>';
+  const root = tabletShell(COCINA, 'kds', inner);
+  const S = $(root, 'screen');
+  const cursor = makeCursor(S, COCINA_TAPS);
+  const t19 = $(S, 'kds-019'), t21 = $(S, 'kds-021'), pend = $(S, 'pend'), alertEl = $(S, 'alert'), bell = $(S, 'bell');
+  function update(t) {
+    const nu = easeOut(seg(t, T_KDS_NEW, T_KDS_NEW + 0.5));
+    t21.style.display = t >= T_KDS_NEW ? '' : 'none';
+    t21.style.opacity = nu; t21.style.transform = 'translateY(' + ((1 - nu) * -34) + 'px) scale(' + (0.96 + 0.04 * nu) + ')';
+    t21.style.setProperty('--glow', ((0.55 + 0.45 * Math.sin((t - T_KDS_NEW) * 6)) * (1 - seg(t, T_KDS_NEW + 2.2, T_KDS_NEW + 3.4))).toFixed(3));
+    const ou = ease(seg(t, T_KDS_19_OUT, T_KDS_19_OUT + 0.45));
+    t19.style.display = ou >= 1 ? 'none' : '';
+    t19.style.opacity = 1 - ou; t19.style.transform = 'translateX(' + (-30 * ou) + 'px) scale(' + (1 - 0.06 * ou) + ')';
+    const press = 1 - seg(Math.abs(t - (COCINA_TAPS[0].t + 0.04)), 0, 0.14);
+    $(S, 'kds-btn-019').style.transform = 'scale(' + (1 - 0.04 * press) + ')';
+    $(S, 'kds-btn-019').classList.toggle('done', t >= COCINA_TAPS[0].t + 0.02);
+    const count = (t >= T_KDS_NEW ? 1 : 0) + (t < T_KDS_19_OUT ? 1 : 0);
+    pend.textContent = count + ' Pendientes';
+    const au = seg(t, T_KDS_NEW, T_KDS_NEW + 0.3) * (1 - seg(t, T_KDS_NEW + 2.2, T_KDS_NEW + 2.6));
+    alertEl.style.opacity = au; alertEl.style.transform = 'translateY(' + ((1 - au) * -16) + 'px)';
+    bell.innerHTML = ic(au > 0.05 ? 'bell' : 'bellOff', 19);
+    bell.classList.toggle('ring', au > 0.05);
+    cursor.update(t);
+  }
+  return { root, update };
+}
+
+/* ================= AMBIENTE ================= */
+function buildAmbient() {
+  const el = document.createElement('div');
+  el.className = 'ambient';
+  const utensils = '<svg class="rail" viewBox="0 0 980 130" width="980" height="130" style="left:50px;top:34px">' +
+    '<rect x="0" y="6" width="980" height="9" rx="4" fill="#B5BEC6"/><rect x="0" y="6" width="980" height="3" rx="1.5" fill="#E7ECF0"/>' +
+    // cucharón
+    '<g transform="translate(70 15)"><path d="M0 0v54" stroke="#98A3AC" stroke-width="5" stroke-linecap="round"/><path d="M-18 54h36a18 18 0 0 1-36 0z" fill="#B5BEC6"/><ellipse cx="0" cy="54" rx="18" ry="5" fill="#D3DAE0"/></g>' +
+    // batidor
+    '<g transform="translate(160 15)"><path d="M0 0v34" stroke="#98A3AC" stroke-width="5" stroke-linecap="round"/><path d="M0 34c-22 8-22 52 0 62M0 34c22 8 22 52 0 62M0 34c-8 12-8 48 0 62M0 34c8 12 8 48 0 62" fill="none" stroke="#B5BEC6" stroke-width="3"/></g>' +
+    // espátula
+    '<g transform="translate(240 15)"><path d="M0 0v50" stroke="#2A2F38" stroke-width="6" stroke-linecap="round"/><rect x="-12" y="48" width="24" height="42" rx="4" fill="#B5BEC6"/></g>' +
+    // sartén colgada
+    '<g transform="translate(860 15)"><path d="M0 0v30" stroke="#2A2F38" stroke-width="7" stroke-linecap="round"/><circle cx="0" cy="70" r="34" fill="#3A404A"/><circle cx="0" cy="70" r="27" fill="#2A2F38"/></g>' +
+    '<g transform="translate(940 15)"><path d="M0 0v50" stroke="#98A3AC" stroke-width="5" stroke-linecap="round"/><rect x="-10" y="48" width="20" height="46" rx="10" fill="#E0A458"/></g></svg>';
+  const pass = '<div class="pass-top"></div><div class="pass-front"></div>' +
+    '<svg style="left:-130px;top:722px" width="170" height="110" viewBox="0 0 170 110"><ellipse cx="85" cy="100" rx="70" ry="8" fill="#000" opacity=".12"/><path d="M20 40h110l8 44a10 10 0 0 1-10 12H22a10 10 0 0 1-10-12z" fill="#7C8791"/><path d="M20 40h110" stroke="#B5BEC6" stroke-width="5"/><path d="M138 52h30" stroke="#2A2F38" stroke-width="9" stroke-linecap="round"/><ellipse cx="75" cy="40" rx="50" ry="8" fill="#C85A32"/></svg>' +
+    '<svg style="left:1040px;top:745px" width="150" height="90" viewBox="0 0 150 90"><ellipse cx="75" cy="82" rx="60" ry="6" fill="#000" opacity=".12"/><path d="M92 22v50M70 22v50" stroke="none"/><rect x="26" y="34" width="98" height="46" rx="6" fill="#98A3AC"/><rect x="26" y="34" width="98" height="8" rx="4" fill="#C9D1D8"/><path d="M45 34v-10h60v10" fill="#B5BEC6"/></svg>';
+  const kitchen = '<div class="wall tile" style="top:-1600px;height:2600px"></div>' + utensils + pass;
+
+  const caja = '<div class="wall cream" style="top:1000px;height:1000px"></div><div class="wains" style="top:1500px;height:300px"></div>' +
+    '<div class="ctr-top" style="top:1776px;height:190px"></div><div class="ctr-front" style="top:1966px;height:130px"></div>' +
+    '<svg style="left:440px;top:1768px" width="200" height="40" viewBox="0 0 200 40"><path d="M10 0h180l12 34H-2z" fill="#2A2F38"/></svg>' +
+    // impresora de tickets
+    '<svg style="left:90px;top:1792px" width="230" height="160" viewBox="0 0 230 160"><ellipse cx="115" cy="146" rx="100" ry="10" fill="#000" opacity=".14"/><rect x="20" y="52" width="190" height="88" rx="16" fill="#FFFFFF" stroke="#D3D9E0" stroke-width="2"/><rect x="34" y="40" width="162" height="22" rx="8" fill="#E7ECF0"/><rect x="74" y="0" width="82" height="48" fill="#fff" stroke="#D3D9E0"/><path d="M84 12h62M84 22h48M84 32h56" stroke="#8A94A0" stroke-width="3" stroke-linecap="round"/><circle cx="190" cy="110" r="6" fill="#12B76A"/></svg>' +
+    // lector de tarjetas
+    '<svg style="left:760px;top:1800px" width="130" height="160" viewBox="0 0 130 160"><ellipse cx="65" cy="148" rx="52" ry="8" fill="#000" opacity=".14"/><rect x="22" y="10" width="86" height="136" rx="14" fill="#2A2F38"/><rect x="32" y="22" width="66" height="34" rx="6" fill="#E7FAFF"/><g fill="#59636F"><rect x="34" y="68" width="18" height="12" rx="3"/><rect x="56" y="68" width="18" height="12" rx="3"/><rect x="78" y="68" width="18" height="12" rx="3"/><rect x="34" y="88" width="18" height="12" rx="3"/><rect x="56" y="88" width="18" height="12" rx="3"/><rect x="78" y="88" width="18" height="12" rx="3"/></g><rect x="34" y="110" width="62" height="14" rx="5" fill="#12B76A"/></svg>' +
+    // campana + planta
+    '<svg style="left:520px;top:1850px" width="90" height="90" viewBox="0 0 90 90"><ellipse cx="45" cy="80" rx="34" ry="6" fill="#000" opacity=".14"/><path d="M12 70c0-30 14-48 33-48s33 18 33 48z" fill="#E0A458"/><rect x="40" y="12" width="10" height="12" rx="5" fill="#B87A2C"/><rect x="8" y="68" width="74" height="8" rx="4" fill="#C98E3A"/></svg>' +
+    '<svg style="left:940px;top:1760px" width="150" height="210" viewBox="0 0 150 210"><ellipse cx="75" cy="196" rx="46" ry="8" fill="#000" opacity=".14"/><path d="M42 130h66l-8 62H50z" fill="#FF6A1F"/><path d="M75 130C60 100 48 70 58 36M75 130C78 96 96 64 110 40M75 130c-14-20-40-30-52-30M75 130c14-24 36-32 52-28" stroke="#3FA34D" stroke-width="5" fill="none" stroke-linecap="round"/><ellipse cx="58" cy="34" rx="14" ry="26" fill="#58BE63"/><ellipse cx="110" cy="38" rx="13" ry="24" fill="#3FA34D" transform="rotate(18 110 38)"/><ellipse cx="24" cy="100" rx="22" ry="10" fill="#7ACB6B"/><ellipse cx="128" cy="100" rx="22" ry="10" fill="#58BE63"/></svg>';
+
+  const mostrador = '<div class="wall cream2" style="top:2096px;height:1500px"></div>' +
+    '<div class="board" style="left:-360px;top:2440px"><b>Menú del día</b><span>Almuerzo Ejecutivo ..... $3.50</span><span>Chuleta ..... $6.00</span><span>Costilla ..... $6.00</span><span>Avena Jarra ..... $2.00</span></div>' +
+    '<div class="shelf" style="left:980px;top:2640px"></div>' +
+    '<svg style="left:1010px;top:2468px" width="170" height="180" viewBox="0 0 150 210"><path d="M42 130h66l-8 62H50z" fill="#E0A458"/><path d="M75 130C60 100 48 70 58 36M75 130C78 96 96 64 110 40" stroke="#3FA34D" stroke-width="5" fill="none" stroke-linecap="round"/><ellipse cx="58" cy="34" rx="14" ry="26" fill="#58BE63"/><ellipse cx="110" cy="38" rx="13" ry="24" fill="#3FA34D" transform="rotate(18 110 38)"/><ellipse cx="24" cy="100" rx="22" ry="10" fill="#7ACB6B"/></svg>' +
+    '<div class="ctr-top m" style="top:3560px;height:900px"></div>' +
+    '<svg style="left:60px;top:3380px" width="1000" height="400" viewBox="0 0 1000 400" class="pshadow"><ellipse cx="480" cy="352" rx="400" ry="34" fill="#000" opacity=".18"/></svg>' +
+    '<svg style="left:960px;top:3520px" width="200" height="190" viewBox="0 0 200 190"><ellipse cx="100" cy="164" rx="70" ry="12" fill="#000" opacity=".14"/><path d="M50 70h86l-8 80a10 10 0 0 1-10 9H68a10 10 0 0 1-10-9z" fill="#fff" stroke="#D3D9E0" stroke-width="2"/><path d="M136 84c26-2 28 36 0 38" fill="none" stroke="#fff" stroke-width="9"/><ellipse cx="93" cy="72" rx="43" ry="8" fill="#7A4A2A"/><path d="M80 44c-6-10 6-14 0-24M100 46c-6-10 6-14 0-24" stroke="#C9D1D8" stroke-width="4" fill="none" stroke-linecap="round" opacity=".7"/></svg>' +
+    '<svg style="left:-300px;top:3560px" width="360" height="200" viewBox="0 0 360 200"><ellipse cx="180" cy="168" rx="150" ry="14" fill="#000" opacity=".12"/><rect x="40" y="70" width="240" height="94" rx="8" fill="#fff" stroke="#D3D9E0" stroke-width="2"/><path d="M60 92h160M60 112h120M60 132h140" stroke="#C9D1D8" stroke-width="5" stroke-linecap="round"/><circle cx="250" cy="130" r="22" fill="#FF6A1F"/></svg>';
+
+  el.innerHTML = kitchen + caja + mostrador;
+  return el;
+}
+
+/* =========================================================
+   ENGINE · un único reloj t -> render(t)
+   cámara, subtítulos, voz opcional y controles (fuera del lienzo)
+   ========================================================= */
+(function () {
+  const world = document.getElementById('world');
+  const stage = document.getElementById('stage');
+  const frame = document.getElementById('frame');
+  const holder = document.getElementById('holder');
+  const subEl = document.getElementById('sub');
+  const closing = document.getElementById('closing');
+
+  /* ---- montar el mundo ---- */
+  world.appendChild(buildAmbient());
+  const mesas = buildMesas(), kds = buildKDS(), phone = buildPhone();
+  world.appendChild(kds.root); world.appendChild(mesas.root); world.appendChild(phone.root);
+
+  /* ---- cámara ---- */
+  function camAt(t) {
+    let i = 0;
+    while (i < CAM.length - 2 && t >= CAM[i + 1][0]) i++;
+    const a = CAM[i], b = CAM[i + 1];
+    const u = ease(seg(t, a[0], b[0]));
+    let s = Math.exp(lerp(Math.log(a[3]), Math.log(b[3]), u));
+    if (a[4]) s *= 1 - 0.5 * Math.sin(Math.PI * u);
+    return { cx: lerp(a[1], b[1], u), cy: lerp(a[2], b[2], u), s };
+  }
+
+  /* ---- subtítulos ---- */
+  let subIdx = -2;
+  function renderSubs(t) {
+    let idx = -1, alpha = 0;
+    for (let i = 0; i < SUBS.length; i++) {
+      const [a, b] = SUBS[i];
+      if (t >= a && t < b) { idx = i; alpha = seg(t, a, a + 0.2) * (1 - seg(t, b - 0.2, b)); }
+    }
+    if (idx !== subIdx) { subEl.textContent = idx >= 0 ? SUBS[idx][2] : ''; subIdx = idx; }
+    subEl.style.opacity = alpha;
+    const cu = seg(t, CLOSING.from, CLOSING.from + 0.5);
+    closing.style.opacity = cu;
+    closing.style.transform = 'translateY(' + ((1 - easeOut(cu)) * 14) + 'px)';
+  }
+
+  /* ---- render determinista ---- */
+  const fade = document.getElementById('loop-fade');
+  // Tres acciones legibles del mismo mundo, con el corte oculto en crema.
+  function sourceAt(t) {
+    if (t < 4) return 3.7 + t * 1.05;        // POS: producto y variantes
+    if (t < 8) return 18.5 + (t - 4);        // KDS: llega la comanda
+    return 25.9 + (t - 8);                  // CRM: conversación del agente
+  }
+  function render(t) {
+    const source = sourceAt(t);
+    const c = camAt(source);
+    world.style.transform = 'translate(' + (VPW / 2) + 'px,' + (VPH / 2) + 'px) scale(' + c.s.toFixed(4) + ') translate(' + (-c.cx).toFixed(2) + 'px,' + (-c.cy).toFixed(2) + 'px)';
+    phone.update(source); mesas.update(source); kds.update(source);
+    const distance = Math.min(t, Math.abs(t - 4), Math.abs(t - 8), Math.abs(t - 12));
+    fade.style.opacity = clamp(1 - distance / 0.28, 0, 1).toFixed(3);
+  }
+
+  /* ---- reproducción ---- */
+  let t = 0, playing = false, last = performance.now(), dirty = true, voiceOn = false;
+  const $id = id => document.getElementById(id);
+  const btnPlay = $id('play'), seek = $id('seek'), timeEl = $id('time'), scriptEl = $id('script');
+  scriptEl.innerHTML = SUBS.map((s, i) => '<p data-i="' + i + '"><span>' + s[0].toFixed(1) + 's</span>' + s[2] + '</p>').join('') +
+    '<p data-i="c"><span>' + CLOSING.from.toFixed(1) + 's</span>' + CLOSING.title + ' — ' + CLOSING.phrase + '</p>';
+  function ui(tt) {
+    seek.value = tt; timeEl.textContent = tt.toFixed(1) + ' / ' + DURATION.toFixed(1) + ' s';
+    btnPlay.innerHTML = playing ? '❚❚ Pausar' : (tt >= DURATION ? '↻ Repetir' : '▶ Reproducir');
+    if (scriptEl.style.display === 'block') [...scriptEl.children].forEach(p => {
+      const i = p.dataset.i; const on = i === 'c' ? tt >= CLOSING.from : (tt >= SUBS[i][0] && tt < SUBS[i][1]);
+      p.classList.toggle('on', on);
+    });
+  }
+  function speak() {}
+  function stopVoice() {}
+  function setT(v, fromUser) { t = clamp(v, 0, DURATION); dirty = true; if (fromUser) stopVoice(); }
+  function play() { if (t >= DURATION) setT(0, true); playing = true; last = performance.now(); dirty = true; }
+  function pause() { playing = false; stopVoice(); dirty = true; }
+
+  function tick(now) {
+    if (playing) {
+      t = (t + Math.min((now - last) / 1000, 0.1)) % DURATION;
+      dirty = true;
+    }
+    last = now;
+    if (dirty) { dirty = false; render(t); }
+    requestAnimationFrame(tick);
+  }
+
+  btnPlay.onclick = () => (playing ? pause() : play());
+  $id('restart').onclick = () => { setT(0, true); play(); };
+  seek.oninput = () => setT(parseFloat(seek.value), true);
+  $id('full').onclick = () => { if (document.fullscreenElement) document.exitFullscreen(); else if (holder.requestFullscreen) holder.requestFullscreen(); };
+  $id('guion').onchange = e => { scriptEl.style.display = e.target.checked ? 'block' : 'none'; dirty = true; };
+  $id('voz').onchange = e => { voiceOn = e.target.checked; if (!voiceOn) stopVoice(); };
+  document.addEventListener('keydown', e => {
+    if (e.code === 'Space') { e.preventDefault(); playing ? pause() : play(); }
+    if (e.code === 'ArrowRight') setT(t + 1, true);
+    if (e.code === 'ArrowLeft') setT(t - 1, true);
+  });
+
+  /* ---- ajuste del lienzo 9:16 ---- */
+  function fit() {
+    const cs = getComputedStyle(holder);
+    const w = holder.clientWidth - parseFloat(cs.paddingLeft) * 2, h = holder.clientHeight - parseFloat(cs.paddingTop) * 2;
+    const sc = Math.max(0.05, Math.min(w / 1080, h / 1920));
+    stage.style.transform = 'scale(' + sc + ')';
+    frame.style.width = (1080 * sc) + 'px'; frame.style.height = (1920 * sc) + 'px';
+  }
+  addEventListener('resize', fit); document.addEventListener('fullscreenchange', fit);
+  if ('speechSynthesis' in window) speechSynthesis.onvoiceschanged = () => {};
+
+  /* ---- API de depuración / integración ---- */
+  window.ERP_TOUR = { render: tt => { setT(tt, true); render(t); }, seek: tt => setT(tt, true), play, pause, get t() { return t; }, duration: DURATION };
+  const m = /[#&?]t=([\d.]+)/.exec(location.hash || '');
+  fit();
+  if (m) { setT(parseFloat(m[1])); render(t); } else { render(0); }
+  window.addEventListener('message', event => {
+    if (event.origin !== location.origin) return;
+    if (event.data?.type === 'restaurant-loop-play') play();
+    if (event.data?.type === 'restaurant-loop-pause') pause();
+  });
+  requestAnimationFrame(tick);
+})();
+
+</script>
+</body>
+</html>
